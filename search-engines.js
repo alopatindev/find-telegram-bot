@@ -27,12 +27,30 @@ class SearchEngines {
     }
 
     findInBotList(query) {
-        return new Promise(resolve => {
-            const results = new Map([
-                ['test2', 'teeest'],
-            ])
-            resolve(results)
-        })
+        return phantom
+            .create()
+            .then(instance => {
+                const page = instance.createPage()
+                page.then(p => {
+                    p.on('onResourceRequested', requestData => {
+                        this.logger.debug(`requesting: ${requestData}`)
+                    })
+
+                    p.open('https://botlist.co')
+                        .then(status => {
+                            this.logger.debug(status)
+                            return page
+                        })
+                        .then(page => page.property('content'))
+                        .then(content => {
+                            this.logger.debug(`content length: ${content.length}`)
+
+                            return instance.exit()
+                        })
+                        .catch(this.logger.error)
+                }).catch(this.logger.error)
+            })
+            .then(() => new Map())
     }
 
     findInStoreBot(query) {

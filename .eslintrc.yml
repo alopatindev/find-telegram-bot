@@ -151,7 +151,7 @@ rules:
   max-statements: warn
   new-cap: warn
   new-parens: warn
-  newline-before-return: warn
+  newline-before-return: off
   newline-per-chained-call: warn
   no-array-constructor: warn
   no-bitwise: warn
