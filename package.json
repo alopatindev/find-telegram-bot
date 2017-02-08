@@ -7,12 +7,14 @@
   "private": false,
   "scripts": {
     "test": "./node_modules/.bin/eslint . && ./node_modules/.bin/mocha test",
-    "start": "node ./server.js"
+    "start": "node ./app.js"
   },
   "dependencies": {
     "eslint": "^3.13.1",
     "mocha": "^3.2.0",
+    "phantom": "^4.0.0",
     "quickcheck": "0.0.4",
-    "telegraf": "^3.6.5"
+    "telegraf": "^3.6.5",
+    "winston": "^2.3.1"
   }
 }
