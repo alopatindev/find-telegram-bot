@@ -17,6 +17,7 @@ bot.command('start', ctx => {
 
 bot.on('message', ctx => {
     const query = ctx.message.text.trim()
+    logger.info(`query="${query}" from "${ctx.from.username}" (${ctx.from.id})`)
 
     if (query.length === 0) {
         ctx.reply(TEXT_WELCOME).catch(logger.error)
