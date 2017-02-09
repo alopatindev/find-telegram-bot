@@ -1,0 +1,6 @@
+'use strict'
+
+module.exports = {
+    live: process.env.DEBUG !== '1',
+    telegramBotToken: '',
+}
