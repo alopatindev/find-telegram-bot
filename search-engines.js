@@ -27,30 +27,37 @@ class SearchEngines {
     }
 
     findInBotList(query) {
-        return phantom
-            .create()
-            .then(instance => {
-                const page = instance.createPage()
-                page.then(p => {
-                    p.on('onResourceRequested', requestData => {
-                        this.logger.debug(`requesting: ${requestData}`)
+        const instancePromise = phantom.create()
+
+        const pagePromise = instancePromise
+            .then(instance => instance.createPage())
+
+        return pagePromise
+            .then(page => {
+                page.on('onResourceRequested', requestData => {
+                    this.logger.debug(`requesting: ${requestData}`)
+                })
+
+                return page
+                    .open('https://botlist.co')
+                    .then(status => {
+                        this.logger.debug(`status=${status}`)
+                        return pagePromise
                     })
+                    .then(page => page.property('content'))
+                    .then(content => {
+                        this.logger.debug(`content length: ${content.length}`)
+                        return instancePromise
 
-                    p.open('https://botlist.co')
-                        .then(status => {
-                            this.logger.debug(status)
-                            return page
-                        })
-                        .then(page => page.property('content'))
-                        .then(content => {
-                            this.logger.debug(`content length: ${content.length}`)
-
-                            return instance.exit()
-                        })
-                        .catch(this.logger.error)
-                }).catch(this.logger.error)
+                    })
+                    .then(instance => {
+                        this.logger.debug('exit instance!')
+                        instance.exit()
+                        return new Map()
+                    })
+                    .catch(this.logger.error)
             })
-            .then(() => new Map())
+            .catch(this.logger.error)
     }
 
     findInStoreBot(query) {
