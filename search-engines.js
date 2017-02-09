@@ -5,6 +5,31 @@ const concatMaps = require('concat-maps')
 
 const TEXT_FOUND_BOTS = 'Found bots: '
 
+function onBotListCreatePage(page, pagePromise, instancePromise) {
+    page.on('onResourceRequested', requestData => {
+        this.logger.debug(`requesting: ${requestData}`)
+    })
+
+    return page
+        .open('https://botlist.co')
+        .then(status => {
+            this.logger.debug(`status=${status}`)
+            return pagePromise
+        })
+        .then(page => page.property('content'))
+        .then(content => {
+            this.logger.debug(`content length: ${content.length}`)
+            return instancePromise
+
+        })
+        .then(instance => {
+            this.logger.debug('exit instance!')
+            instance.exit()
+            return new Map()
+        })
+        .catch(this.logger.error)
+}
+
 class SearchEngines {
     constructor(logger) {
         this.logger = logger
@@ -33,30 +58,7 @@ class SearchEngines {
             .then(instance => instance.createPage())
 
         return pagePromise
-            .then(page => {
-                page.on('onResourceRequested', requestData => {
-                    this.logger.debug(`requesting: ${requestData}`)
-                })
-
-                return page
-                    .open('https://botlist.co')
-                    .then(status => {
-                        this.logger.debug(`status=${status}`)
-                        return pagePromise
-                    })
-                    .then(page => page.property('content'))
-                    .then(content => {
-                        this.logger.debug(`content length: ${content.length}`)
-                        return instancePromise
-
-                    })
-                    .then(instance => {
-                        this.logger.debug('exit instance!')
-                        instance.exit()
-                        return new Map()
-                    })
-                    .catch(this.logger.error)
-            })
+            .then(page => onBotListCreatePage.bind(this)(page, pagePromise, instancePromise))
             .catch(this.logger.error)
     }
 
