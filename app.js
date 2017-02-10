@@ -27,7 +27,6 @@ bot.on('message', ctx => {
             .find(query)
             .then(result => {
                 result = result.slice(0, MAX_MESSAGE_LENGTH) // FIXME: split messages
-                logger.debug(result)
                 return ctx.reply(result)
             })
             .catch(logger.error)

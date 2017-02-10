@@ -133,7 +133,7 @@ rules:
     - allowArrowFunctions: true
   id-length:
     - warn
-    - exceptions: ['i', 'j', 'k', 'n', 'm', 'x', 'y', 'z']
+    - exceptions: ['e', 'i', 'j', 'k', 'n', 'm', 'x', 'y', 'z']
   key-spacing: warn
   keyword-spacing: warn
   lines-around-directive: warn
