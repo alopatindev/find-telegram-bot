@@ -1,0 +1,10 @@
+env:
+  browser: true
+  jquery: true
+  phantomjs: true
+rules:
+  func-names: off
+  no-console: off
+  no-var: off
+  object-shorthand: off
+  prefer-template: off

@@ -3,7 +3,7 @@
 const config = require('./config.js')
 const logger = require('./logger.js')(config)
 
-const SearchEngines = require('./search-engines.js')
+const SearchEngines = require('./search-engines')
 const Telegraf = require('telegraf')
 
 const TEXT_WELCOME = 'Hi! Please type your search query!'
@@ -26,8 +26,8 @@ bot.on('message', ctx => {
         searchEngines
             .find(query)
             .then(result => {
-                result = result.slice(0, MAX_MESSAGE_LENGTH) // FIXME: split messages
-                return ctx.reply(result)
+                const resultCut = result.slice(0, MAX_MESSAGE_LENGTH) // FIXME: split messages
+                return ctx.reply(resultCut)
             })
             .catch(logger.error)
     }
