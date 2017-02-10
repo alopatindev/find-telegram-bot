@@ -7,6 +7,7 @@ const SearchEngines = require('./search-engines.js')
 const Telegraf = require('telegraf')
 
 const TEXT_WELCOME = 'Hi! Please type your search query!'
+const MAX_MESSAGE_LENGTH = 4096
 
 const searchEngines = new SearchEngines(logger)
 const bot = new Telegraf(config.telegramBotToken)
@@ -25,6 +26,7 @@ bot.on('message', ctx => {
         searchEngines
             .find(query)
             .then(result => {
+                result = result.slice(0, MAX_MESSAGE_LENGTH) // FIXME: split messages
                 logger.debug(result)
                 return ctx.reply(result)
             })

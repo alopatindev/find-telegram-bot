@@ -7,6 +7,8 @@ const TEXT_FOUND_BOTS = 'Found bots: '
 const USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1'
 
 function storeBotBrowserScript() {
+    const MAX_DESCRIPTION_LENGTH = 40
+
     try {
         console.debug('storeBotBrowserScript!')
 
@@ -14,19 +16,22 @@ function storeBotBrowserScript() {
         const urls = botItems.find('a')
         const descriptions = botItems.find('.description')
 
-        var result = []
+        var result = [] // FIXME: make immutable?
         for (var i = 0; i < urls.length; i++) {
             const botName = urls[i]
                 .href
                 .replace('https://storebot.me/bot/', '') // FIXME
-            const description = descriptions[i].innerText.trim()
-            console.debug('bot = ' + botName)
-            console.debug('description = ' + description)
+            const description = descriptions[i]
+                .innerText
+                .trim()
+                .replace('\n', '')
+                .replace('@', '')
+                .slice(0, MAX_DESCRIPTION_LENGTH)
             result.push([botName, description])
         }
 
         console.debug('storeBotBrowserScript! ends')
-        window.callPhantom(result)
+        //window.callPhantom(result)
         console.debug('storeBotBrowserScript! ended!')
         return result
     } catch (e) {
@@ -49,7 +54,7 @@ function onStoreBotCreatePage(page, pagePromise, instancePromise, query) {
         console.debug('onCallback')
         // console.debug('onCallback ' + data)
         console.debug('instance exiting')
-        phantom.exit()
+        //phantom.exit()
     })
 
     const url = encodeURI(`https://storebot.me/search?text=${query}`)
@@ -65,18 +70,19 @@ function onStoreBotCreatePage(page, pagePromise, instancePromise, query) {
         .then(() => page.property('content'))
         .then(content => {
             this.logger.debug(`content length: ${content.length}`)
-            page
+            const result = page
                 .evaluate(storeBotBrowserScript)
                 .catch(this.logger.error)
-            return instancePromise
-
+            this.logger.debug(`result = ${result}`)
+            //return instancePromise
+            return result
         })
-        .then(instance => {
+        .then(result => {
             // instance is phantom in phantom context
-            //page.render('test.png')
-            //this.logger.debug('exit instance!')
+            page.render('test.png')
+            this.logger.debug('exit instance!')
             //instance.exit()
-            return new Map()
+            return new Map(result)
         })
         .catch(this.logger.error)
 }
@@ -94,6 +100,7 @@ class SearchEngines {
                 const mergedResults = concatMaps.concat(...results)
                 const text = Array
                     .from(mergedResults)
+                    .filter(([bot, description]) => bot.endsWith('bot'))
                     .map(([bot, description]) => `@${bot} — ${description}`)
                     .join('\n')
 
