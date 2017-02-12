@@ -7,7 +7,8 @@ const SearchEngines = require('./search-engines')
 const Telegraf = require('telegraf')
 
 const TEXT_WELCOME = 'Hi! Please type your search query!'
-const MAX_MESSAGE_LENGTH = 4096
+const TEXT_FOUND_BOTS = 'Found bots: '
+const MAX_MESSAGE_LINES = 20
 
 const searchEngines = new SearchEngines(logger)
 const bot = new Telegraf(config.telegramBotToken)
@@ -21,14 +22,26 @@ bot.on('message', ctx => {
     logger.info(`query="${query}" from "${ctx.from.username}" (${ctx.from.id})`)
 
     if (query.length === 0) {
-        ctx.reply(TEXT_WELCOME).catch(logger.error)
+        ctx
+            .reply(TEXT_WELCOME)
+            .catch(logger.error)
     } else {
         searchEngines
             .find(query)
-            .then(result => {
-                const resultCut = result.slice(0, MAX_MESSAGE_LENGTH) // FIXME: split messages
-                return ctx.reply(resultCut)
-            })
+            .then(lines => ctx
+                .reply(`${TEXT_FOUND_BOTS}${lines.length}`)
+                .then(x => {
+                    for (let i = 0; i < lines.length; i += MAX_MESSAGE_LINES) {
+                        const message = lines
+                            .slice(i, i + MAX_MESSAGE_LINES)
+                            .join('\n')
+                        ctx
+                            .reply(message)
+                            .catch(logger.error)
+                    }
+                })
+                .catch(logger.error)
+            )
             .catch(logger.error)
     }
 })

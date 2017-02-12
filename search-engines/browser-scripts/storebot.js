@@ -1,7 +1,9 @@
 'use strict'
 
 module.exports = function() {
-    const MAX_DESCRIPTION_LENGTH = 40
+    function htmlDecode(value) {
+        return $("<div/>").html(value).text()
+    }
 
     var result = []
     try {
@@ -15,11 +17,9 @@ module.exports = function() {
             const botName = urls[i]
                 .href
                 .replace('https://storebot.me/bot/', '') // FIXME
-            const description = descriptions[i]
-                .innerText
-                .trim()
-                .replace(/[@\n]/g, '')
-                .slice(0, MAX_DESCRIPTION_LENGTH)
+
+            const description = htmlDecode(descriptions[i].innerText.trim())
+
             result.push([botName, description])
         }
 

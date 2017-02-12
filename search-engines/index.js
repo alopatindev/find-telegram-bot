@@ -5,9 +5,28 @@ const concatMaps = require('concat-maps')
 const commonBrowserScripts = require('./browser-scripts/common.js')
 const storeBotBrowserScript = require('./browser-scripts/storebot.js')
 
-const TEXT_FOUND_BOTS = 'Found bots: '
 const USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1'
-const JQUERY_URL = 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js'
+const JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'
+const MAX_DESCRIPTION_LENGTH = 100
+const DOTS_CHARACTER = String.fromCharCode(8230)
+
+function filterText(text) {
+    let result = text
+        .trim()
+        .replace(/[@\n]/g, '')
+        .replace(/(?:https?|ftp):\/\/[\n\S]+/g, '')
+
+    if (result.length > MAX_DESCRIPTION_LENGTH) {
+        result = result.slice(0, MAX_DESCRIPTION_LENGTH)
+        const hasDots = result.endsWith('...') || result.endsWith(DOTS_CHARACTER)
+
+        if (!hasDots) {
+            result = `${result}${DOTS_CHARACTER}`
+        }
+    }
+
+    return result
+}
 
 class SearchEngines {
     constructor(logger) {
@@ -20,13 +39,12 @@ class SearchEngines {
             .all([this.findInStoreBot(query), this.findInTgram(query)])
             .then(results => {
                 const mergedResults = concatMaps.concat(...results)
-                const text = Array
+                const lines = Array
                     .from(mergedResults)
                     .filter(botAndDescription => botAndDescription[0].endsWith('bot'))
-                    .map(([bot, description]) => `@${bot} — ${description}`)
-                    .join('\n')
-
-                return `${TEXT_FOUND_BOTS}${mergedResults.size}\n${text}`
+                    .map(([bot, description]) => `@${bot} — ${filterText(description)}`)
+                this.logger.debug(`lines.length = ${lines.length}`)
+                return lines
             })
             .catch(this.logger.error)
     }
