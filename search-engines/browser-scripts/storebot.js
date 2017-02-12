@@ -1,30 +1,35 @@
 'use strict'
 
 module.exports = function() {
+    const BOT_URL_PREFIX = 'https://storebot.me/bot/'
+
     function htmlDecode(value) {
         return $('<div/>')
             .html(value)
             .text()
     }
 
-    var result = []
-    try {
-        console.debug('storeBotBrowserScript')
-
+    function script() {
         const botItems = $('.botitem').find('.info')
         const urls = botItems.find('a')
         const descriptions = botItems.find('.description')
 
-        for (var i = 0; i < urls.length; i++) {
-            const botName = urls[i]
-                .href
-                .replace('https://storebot.me/bot/', '') // FIXME
+        return urls
+            .toArray()
+            .map(function(url, index) {
+                const botName = url
+                    .href
+                    .replace(BOT_URL_PREFIX, '')
+                const description = htmlDecode(descriptions[index].innerText.trim())
+                return [botName, description]
+            })
+    }
 
-            const description = htmlDecode(descriptions[i].innerText.trim())
+    var result = []
 
-            result.push([botName, description])
-        }
-
+    try {
+        console.debug('storeBotBrowserScript')
+        result = script()
         console.debug('storeBotBrowserScript end')
     } catch (e) {
         console.error(e)
