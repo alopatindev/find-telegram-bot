@@ -7,13 +7,14 @@
   "private": false,
   "scripts": {
     "test": "./node_modules/.bin/eslint . && ./node_modules/.bin/mocha test",
-    "debug": "DEBUG=1 node --trace-warnings ./app.js",
-    "start": "node ./app.js"
+    "debug": "DEBUG=1 ./node_modules/.bin/nodemon --trace-warnings ./app.js",
+    "start": "./node_modules/.bin/nodemon ./app.js"
   },
   "dependencies": {
     "concat-maps": "^1.0.2",
     "eslint": "^3.13.1",
     "mocha": "^3.2.0",
+    "nodemon": "^1.11.0",
     "phantom": "^4.0.0",
     "quickcheck": "0.0.4",
     "telegraf": "^3.6.5",
