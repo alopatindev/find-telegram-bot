@@ -2,7 +2,9 @@
 
 module.exports = function() {
     function htmlDecode(value) {
-        return $("<div/>").html(value).text()
+        return $('<div/>')
+            .html(value)
+            .text()
     }
 
     var result = []

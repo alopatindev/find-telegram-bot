@@ -8,6 +8,7 @@ const Telegraf = require('telegraf')
 
 const TEXT_WELCOME = 'Hi! Please type your search query!'
 const TEXT_FOUND_BOTS = 'Found bots: '
+
 const MAX_MESSAGE_LINES = 20
 
 const searchEngines = new SearchEngines(logger)
@@ -30,7 +31,7 @@ bot.on('message', ctx => {
             .find(query)
             .then(lines => ctx
                 .reply(`${TEXT_FOUND_BOTS}${lines.length}`)
-                .then(x => {
+                .then(() => {
                     for (let i = 0; i < lines.length; i += MAX_MESSAGE_LINES) {
                         const message = lines
                             .slice(i, i + MAX_MESSAGE_LINES)

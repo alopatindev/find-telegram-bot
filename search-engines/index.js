@@ -6,8 +6,11 @@ const commonBrowserScripts = require('./browser-scripts/common.js')
 const storeBotBrowserScript = require('./browser-scripts/storebot.js')
 
 const USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1'
+
 const MAX_DESCRIPTION_LENGTH = 100
-const DOTS_CHARACTER = String.fromCharCode(8230)
+
+const DOTS_CHARACTER_CODE = 8230
+const DOTS_CHARACTER = String.fromCharCode(DOTS_CHARACTER_CODE)
 
 function filterText(text) {
     let result = text
