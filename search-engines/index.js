@@ -6,7 +6,6 @@ const commonBrowserScripts = require('./browser-scripts/common.js')
 const storeBotBrowserScript = require('./browser-scripts/storebot.js')
 
 const USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1'
-const JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'
 const MAX_DESCRIPTION_LENGTH = 100
 const DOTS_CHARACTER = String.fromCharCode(8230)
 
@@ -89,19 +88,13 @@ class SearchEngines {
             .open(url)
             .then(status => {
                 if (status !== 'success') {
-                    this.logger.error(`Failed to load '${url}' status=${status}`)
+                    throw new Error(`Failed to load '${url}' status=${status}`)
                 }
-
-                page.includeJs(JQUERY_URL)
             })
             .then(() => page.property('content'))
             .then(content => {
                 this.logger.debug(`content length: ${content.length}`)
-                const result = page
-                    .evaluate(storeBotBrowserScript)
-                    .catch(this.logger.error)
-                this.logger.debug(`result = ${result}`)
-                return result
+                return page.evaluate(storeBotBrowserScript)
             })
             .then(result => {
                 // instance is phantom in phantom context
@@ -114,7 +107,16 @@ class SearchEngines {
                     .catch(this.logger.error)
                 return new Map(result)
             })
-            .catch(this.logger.error)
+            .catch(e => {
+                this.logger.error(e)
+                instancePromise
+                    .then(instance => {
+                        this.logger.debug('exit instance due to failure')
+                        instance.exit()
+                    })
+                    .catch(this.logger.error)
+                return new Map()
+            })
     }
 }
 
