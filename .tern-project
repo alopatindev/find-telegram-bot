@@ -1,0 +1,23 @@
+ {
+   "ecmaVersion": 6,
+   "libs": [
+     "browser",
+     "jquery",
+     "ecmascript"
+   ],
+   "loadEagerly": ["**/*.js"],
+   "dontLoad": ["node_modules"],
+   "plugins": {
+     "modules": {},
+     "es_modules": {},
+     "node": {},
+     "requirejs": {
+       "baseURL": "./",
+       "paths": {}
+     },
+     "doc_comment": {
+       "fullDocs": true,
+       "strong": true
+     }
+   }
+ }
