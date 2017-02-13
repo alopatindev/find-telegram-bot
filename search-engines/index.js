@@ -30,6 +30,68 @@ function filterText(text) {
     return result
 }
 
+function createPage(query, callback) {
+    const instancePromise = phantomjs
+        .create([
+            '--load-images=no',
+            '--web-security=false',
+            '--ignore-ssl-errors=true',
+            //'--debug=true',
+        ], {
+            //logger: this.logger,
+        })
+        .catch(this.logger.error)
+
+    const pagePromise = instancePromise
+        .then(instance => instance.createPage())
+        .catch(this.logger.error)
+
+    return pagePromise
+        .then(page => callback.bind(this)(page, instancePromise, query))
+        .catch(this.logger.error)
+}
+
+function onStoreBotCreatePage(page, instancePromise, query) {
+    const baseUrl = 'https://storebot.me'
+    const url = encodeURI(`${baseUrl}/search?text=${query}`)
+    page.setting('userAgent', USER_AGENT)
+    page.property('onConsoleMessage', commonBrowserScripts.onConsoleMessage)
+
+    return page
+        .open(url)
+        .then(status => {
+            if (status !== 'success') {
+                throw new Error(`Failed to load '${url}' status=${status}`)
+            }
+        })
+        .then(() => page.property('content'))
+        .then(content => {
+            this.logger.debug(`content length: ${content.length}`)
+            return page.evaluate(storeBotBrowserScript)
+        })
+        .then(result => {
+            // instance is phantom in phantom context
+            page.render('test.png')
+            instancePromise
+                .then(instance => {
+                    this.logger.debug('exit instance')
+                    instance.exit()
+                })
+                .catch(this.logger.error)
+            return new Map(result)
+        })
+        .catch(e => {
+            this.logger.error(e)
+            instancePromise
+                .then(instance => {
+                    this.logger.debug('exit instance due to failure')
+                    instance.exit()
+                })
+                .catch(this.logger.error)
+            return new Map()
+        })
+}
+
 class SearchEngines {
     constructor(logger) {
         this.logger = logger
@@ -57,74 +119,17 @@ class SearchEngines {
     }
 
     findInStoreBot(query) {
-        const instancePromise = phantomjs
-            .create([
-                '--load-images=no',
-                '--web-security=false',
-                '--ignore-ssl-errors=true',
-                //'--debug=true',
-            ], {
-                //logger: this.logger,
-            })
-            .catch(this.logger.error)
-
-        const pagePromise = instancePromise
-            .then(instance => instance.createPage())
-            .catch(this.logger.error)
-
-        return pagePromise
-            .then(page => this.onStoreBotCreatePage(page, instancePromise, query))
-            .catch(this.logger.error)
+        return createPage.bind(this)(query, onStoreBotCreatePage)
     }
 
     findInTgram(query) {
         return new Promise(resolve => {
             const results = new Map([
-                ['test1', 'teeest'],
+                ['test1bot', 'teeest'],
             ])
+            this.logger.debug(results)
             resolve(results)
         })
-    }
-
-    onStoreBotCreatePage(page, instancePromise, query) {
-        const baseUrl = 'https://storebot.me'
-        const url = encodeURI(`${baseUrl}/search?text=${query}`)
-        page.setting('userAgent', USER_AGENT)
-        page.property('onConsoleMessage', commonBrowserScripts.onConsoleMessage)
-
-        return page
-            .open(url)
-            .then(status => {
-                if (status !== 'success') {
-                    throw new Error(`Failed to load '${url}' status=${status}`)
-                }
-            })
-            .then(() => page.property('content'))
-            .then(content => {
-                this.logger.debug(`content length: ${content.length}`)
-                return page.evaluate(storeBotBrowserScript)
-            })
-            .then(result => {
-                // instance is phantom in phantom context
-                page.render('test.png')
-                instancePromise
-                    .then(instance => {
-                        this.logger.debug('exit instance')
-                        instance.exit()
-                    })
-                    .catch(this.logger.error)
-                return new Map(result)
-            })
-            .catch(e => {
-                this.logger.error(e)
-                instancePromise
-                    .then(instance => {
-                        this.logger.debug('exit instance due to failure')
-                        instance.exit()
-                    })
-                    .catch(this.logger.error)
-                return new Map()
-            })
     }
 }
 
