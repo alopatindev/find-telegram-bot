@@ -111,6 +111,7 @@ class SearchEngines {
                 const lines = Array
                     .from(mergedResults)
                     .filter(botAndDescription => botAndDescription[0].endsWith('bot'))
+                    .sort()
                     .map(([bot, description]) => `@${bot} — ${filterText(description)}`)
                 this.logger.debug(`lines.length = ${lines.length}`)
                 return lines
