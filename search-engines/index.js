@@ -35,6 +35,11 @@ class SearchEngines {
         this.logger = logger
     }
 
+    /**
+     * Finds bots
+     * @param {String} query query
+     * @return {Promise} find
+     */
     find(query) {
         // TODO: if cached then get
         return Promise

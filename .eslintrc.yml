@@ -214,3 +214,4 @@ rules:
   symbol-description: warn
   template-curly-spacing: warn
   yield-star-spacing: warn
+  valid-jsdoc: warn
