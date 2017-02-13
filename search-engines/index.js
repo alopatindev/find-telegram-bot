@@ -2,10 +2,13 @@
 
 const phantomjs = require('phantom')
 const concatMaps = require('concat-maps')
+
 const commonBrowserScripts = require('./browser-scripts/common.js')
 const storeBotBrowserScript = require('./browser-scripts/storebot.js')
+const tgramBrowserScript = require('./browser-scripts/tgram.js')
 
 const USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1'
+const BOT_POSTFIX = 'bot'
 
 const MAX_DESCRIPTION_LENGTH = 100
 
@@ -71,6 +74,46 @@ function onStoreBotCreatePage(page, instancePromise, query) {
         .then(() => page.evaluate(storeBotBrowserScript))
         .then(result => {
             // instance is phantom in phantom context
+            instancePromise
+                .then(instance => {
+                    this.logger.debug('exit instance')
+                    instance.exit()
+                })
+                .catch(this.logger.error)
+            return new Map(result)
+        })
+        .catch(e => {
+            this.logger.error(e)
+            instancePromise
+                .then(instance => {
+                    this.logger.debug('exit instance due to failure')
+                    instance.exit()
+                })
+                .catch(this.logger.error)
+            return new Map()
+        })
+}
+
+function onTgramCreatePage(page, instancePromise, query) {
+    const baseUrl = 'https://tgram.ru'
+    const url = encodeURI(`${baseUrl}/bots`)
+    page.setting('userAgent', USER_AGENT)
+    page.property('onConsoleMessage', commonBrowserScripts.onConsoleMessage)
+
+    return page
+        .open(url)
+        .then(status => {
+            if (status !== 'success') {
+                throw new Error(`Failed to load '${url}' status=${status}`)
+            }
+        })
+        .then(() => {
+            const script = `function() { this.baseUrl = "${baseUrl}"; this.query = "${query}" }`
+            return page.evaluateJavaScript(script)
+        })
+        .then(() => page.evaluate(tgramBrowserScript))
+        .then(result => {
+            // instance is phantom in phantom context
             page.render('test.png')
             instancePromise
                 .then(instance => {
@@ -110,7 +153,7 @@ class SearchEngines {
                 const mergedResults = concatMaps.concat(...results)
                 const lines = Array
                     .from(mergedResults)
-                    .filter(botAndDescription => botAndDescription[0].endsWith('bot'))
+                    .filter(botAndDescription => botAndDescription[0].toLowerCase().endsWith(BOT_POSTFIX))
                     .sort()
                     .map(([bot, description]) => `@${bot} — ${filterText(description)}`)
                 this.logger.debug(`lines.length = ${lines.length}`)
@@ -124,13 +167,7 @@ class SearchEngines {
     }
 
     findInTgram(query) {
-        return new Promise(resolve => {
-            const results = new Map([
-                ['test1bot', 'teeest'],
-            ])
-            this.logger.debug(results)
-            resolve(results)
-        })
+        return createPage.bind(this)(query, onTgramCreatePage)
     }
 }
 

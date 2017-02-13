@@ -19,7 +19,12 @@ bot.command('start', ctx => {
 })
 
 bot.on('message', ctx => {
-    const query = ctx.message.text.trim()
+    const query = ctx
+        .message
+        .text
+        .trim()
+        .toLowerCase()
+
     logger.info(`query="${query}" from "${ctx.from.username}" (${ctx.from.id})`)
 
     if (query.length === 0) {
