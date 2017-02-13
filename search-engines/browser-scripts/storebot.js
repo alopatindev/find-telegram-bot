@@ -1,7 +1,7 @@
 'use strict'
 
 module.exports = function() {
-    const BOT_URL_PREFIX = 'https://storebot.me/bot/'
+    const botUrlPrefix = this.baseUrl + '/bot/'
 
     function htmlDecode(value) {
         return $('<div/>')
@@ -19,7 +19,7 @@ module.exports = function() {
             .map(function(url, index) {
                 const botName = url
                     .href
-                    .replace(BOT_URL_PREFIX, '')
+                    .replace(botUrlPrefix, '')
                 const description = htmlDecode(descriptions[index].innerText.trim())
                 return [botName, description]
             })

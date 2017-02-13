@@ -64,11 +64,11 @@ function onStoreBotCreatePage(page, instancePromise, query) {
                 throw new Error(`Failed to load '${url}' status=${status}`)
             }
         })
-        .then(() => page.property('content'))
-        .then(content => {
-            this.logger.debug(`content length: ${content.length}`)
-            return page.evaluate(storeBotBrowserScript)
+        .then(() => {
+            const script = `function() { this.baseUrl = "${baseUrl}" }`
+            page.evaluateJavaScript(script)
         })
+        .then(() => page.evaluate(storeBotBrowserScript))
         .then(result => {
             // instance is phantom in phantom context
             page.render('test.png')
