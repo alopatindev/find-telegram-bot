@@ -28,9 +28,9 @@ module.exports = function() {
     var result = []
 
     try {
-        console.debug('storeBotBrowserScript')
+        console.debug('storeBotScript')
         result = script()
-        console.debug('storeBotBrowserScript end')
+        console.debug('storeBotScript end')
     } catch (e) {
         console.error(e)
     }

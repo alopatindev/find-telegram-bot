@@ -9,9 +9,9 @@ const Telegraf = require('telegraf')
 const TEXT_WELCOME = 'Hi! Please type your search query!'
 const TEXT_FOUND_BOTS = 'Found bots: '
 
-const MAX_MESSAGE_LINES = 20
+const MAX_MESSAGE_LINES = 25
 
-const searchEngines = new SearchEngines(logger)
+const searchEngines = new SearchEngines(logger, config)
 const bot = new Telegraf(config.telegramBotToken)
 
 bot.command('start', ctx => {

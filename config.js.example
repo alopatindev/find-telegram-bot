@@ -3,4 +3,5 @@
 module.exports = {
     live: process.env.DEBUG !== '1',
     telegramBotToken: '',
+    scrapingTimeoutMs: 30000,
 }

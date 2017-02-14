@@ -1,53 +1,47 @@
 'use strict'
 
-function tgramSearchScript() {
-    const botUrlPrefix = this.baseUrl + '/bots/'
-
+module.exports = function() {
     function script() {
+        const botUrlPrefix = this.baseUrl + '/bots/'
+
         const inputGroup = $('.input-group')
         const inputField = inputGroup.find('.form-control')
-        const submitButton = inputGroup.find('.input-group-btn')
 
-        inputField.val(this.query)
-        submitButton.click()
+        inputField
+            .val(this.query)
+            .change()
+
+        $('.jtable-page-info')
+            .on('DOMSubtreeModified', function() {
+                console.debug('computing results')
+
+                const table = $('tr[class="jtable-data-row jtable-row-even"]')
+                const urls = table
+                    .find('small')
+                    .find('a')
+
+                const result = urls
+                    .toArray()
+                    .filter(function(url) {
+                        return url.href.indexOf(botUrlPrefix) === 0
+                    })
+                    .map(function(url, index) {
+                        const botName = url
+                            .href
+                            .replace(botUrlPrefix, '')
+                        const description = url.innerText
+                        return [botName, description]
+                    })
+
+                window.callPhantom(result) // runs onCallback
+            })
     }
 
-    var result = []
-
     try {
-        console.debug('tgramSearchScript')
+        console.debug('tgramScript')
         script()
-        console.debug('tgramSearchScript end')
+        console.debug('tgramScript end')
     } catch (e) {
         console.error(e)
     }
-}
-
-function tgramExpandPageScript() {
-    const botUrlPrefix = this.baseUrl + '/bots/'
-
-    console.debug('botUrlPrefix=' + botUrlPrefix)
-
-    function script() {
-        const pageSizeSelect = $('.jtable-page-size-change[select]')
-        console.debug('pageSizeSelect=' + pageSizeSelect)
-        return []
-    }
-
-    var result = []
-
-    try {
-        console.debug('tgramExpandPageScript')
-        result = script()
-        console.debug('tgramExpandPageScript end')
-    } catch (e) {
-        console.error(e)
-    }
-
-    return result
-}
-
-module.exports = {
-    tgramSearchScript: tgramSearchScript,
-    tgramExpandPageScript: tgramExpandPageScript,
 }
