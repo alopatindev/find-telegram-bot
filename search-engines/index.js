@@ -3,9 +3,9 @@
 const phantomjs = require('phantom')
 const concatMaps = require('concat-maps')
 
-const commonBrowserScripts = require('./browser-scripts/common.js')
-const storeBotBrowserScript = require('./browser-scripts/storebot.js')
-const tgramBrowserScript = require('./browser-scripts/tgram.js')
+const commonScripts = require('./browser-scripts/common.js')
+const storeBotScript = require('./browser-scripts/storebot.js')
+const tgramScripts = require('./browser-scripts/tgram.js')
 
 const USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1'
 const BOT_POSTFIX = 'bot'
@@ -58,7 +58,7 @@ function onStoreBotCreatePage(page, instancePromise, query) {
     const baseUrl = 'https://storebot.me'
     const url = encodeURI(`${baseUrl}/search?text=${query}`)
     page.setting('userAgent', USER_AGENT)
-    page.property('onConsoleMessage', commonBrowserScripts.onConsoleMessage)
+    page.property('onConsoleMessage', commonScripts.onConsoleMessage)
 
     return page
         .open(url)
@@ -71,7 +71,7 @@ function onStoreBotCreatePage(page, instancePromise, query) {
             const script = `function() { this.baseUrl = "${baseUrl}" }`
             page.evaluateJavaScript(script)
         })
-        .then(() => page.evaluate(storeBotBrowserScript))
+        .then(() => page.evaluate(storeBotScript))
         .then(result => {
             // instance is phantom in phantom context
             instancePromise
@@ -98,7 +98,7 @@ function onTgramCreatePage(page, instancePromise, query) {
     const baseUrl = 'https://tgram.ru'
     const url = encodeURI(`${baseUrl}/bots`)
     page.setting('userAgent', USER_AGENT)
-    page.property('onConsoleMessage', commonBrowserScripts.onConsoleMessage)
+    page.property('onConsoleMessage', commonScripts.onConsoleMessage)
 
     return page
         .open(url)
@@ -111,7 +111,8 @@ function onTgramCreatePage(page, instancePromise, query) {
             const script = `function() { this.baseUrl = "${baseUrl}"; this.query = "${query}" }`
             return page.evaluateJavaScript(script)
         })
-        .then(() => page.evaluate(tgramBrowserScript))
+        .then(() => page.evaluate(tgramScripts.tgramSearchScript))
+        .then(() => page.evaluate(tgramScripts.tgramExpandPageScript))
         .then(result => {
             // instance is phantom in phantom context
             page.render('test.png')

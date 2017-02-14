@@ -1,36 +1,53 @@
 'use strict'
 
-module.exports = function() {
+function tgramSearchScript() {
     const botUrlPrefix = this.baseUrl + '/bots/'
-
-    console.debug('botUrlPrefix=' + botUrlPrefix)
-    console.debug('query=' + this.query)
 
     function script() {
         const inputGroup = $('.input-group')
         const inputField = inputGroup.find('.form-control')
         const submitButton = inputGroup.find('.input-group-btn')
-        const pageSizeSelect = $('.jtable-page-size-change[select]')
-
-        console.debug('inputGroup=' + inputGroup)
-        console.debug('inputField=' + inputField)
-        console.debug('submitButton=' + submitButton)
-        console.debug('pageSizeSelect=' + pageSizeSelect)
 
         inputField.val(this.query)
+        submitButton.click()
+    }
 
+    var result = []
+
+    try {
+        console.debug('tgramSearchScript')
+        script()
+        console.debug('tgramSearchScript end')
+    } catch (e) {
+        console.error(e)
+    }
+}
+
+function tgramExpandPageScript() {
+    const botUrlPrefix = this.baseUrl + '/bots/'
+
+    console.debug('botUrlPrefix=' + botUrlPrefix)
+
+    function script() {
+        const pageSizeSelect = $('.jtable-page-size-change[select]')
+        console.debug('pageSizeSelect=' + pageSizeSelect)
         return []
     }
 
     var result = []
 
     try {
-        console.debug('tgramBrowserScript')
+        console.debug('tgramExpandPageScript')
         result = script()
-        console.debug('tgramBrowserScript end')
+        console.debug('tgramExpandPageScript end')
     } catch (e) {
         console.error(e)
     }
 
     return result
+}
+
+module.exports = {
+    tgramSearchScript: tgramSearchScript,
+    tgramExpandPageScript: tgramExpandPageScript,
 }
