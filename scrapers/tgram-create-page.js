@@ -41,14 +41,12 @@ module.exports = (query, phantomObjects, appObjects) => {
             return page.evaluateJavaScript(script)
         })
         .then(() => page.evaluate(tgramScript))
-        .then(() =>
-            new Promise((resolve, reject) => {
-                shared.onResolveResult = resolve
-                shared.onRejectResult = reject
-                logger.debug(`set scraping timeout to ${config.scrapingTimeoutMs}`)
-                setTimeout(() => shared.onRejectResult(new Error('Scraping Timeout')), config.scrapingTimeoutMs)
-            })
-        )
+        .then(() => new Promise((resolve, reject) => {
+            shared.onResolveResult = resolve
+            shared.onRejectResult = reject
+            logger.debug(`set scraping timeout to ${config.scrapingTimeoutMs}`)
+            setTimeout(() => shared.onRejectResult(new Error('Scraping Timeout')), config.scrapingTimeoutMs)
+        }))
         .catch(e => {
             logger.error(e)
             instancePromise

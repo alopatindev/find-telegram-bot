@@ -48,7 +48,6 @@ function createPage(query, callback, appObjects) {
     const instancePromise = phantomjs
         .create([
             '--load-images=no',
-            '--web-security=false',
             '--ignore-ssl-errors=true',
             //'--debug=true',
         ], {
