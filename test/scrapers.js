@@ -5,14 +5,13 @@ const assert = require('assert')
 const Scrapers = require('../scrapers')
 
 function makeOnCreatePageMock(results) {
-    const callback = (query, phantomObjects, appObjects) => {
-        return new Promise(resolve => {
+    const callback = (query, phantomObjects) =>
+        new Promise(resolve => {
             phantomObjects
                 .instancePromise
                 .then(instance => instance.exit())
             resolve(results)
         })
-    }
 
     return callback
 }
@@ -36,11 +35,11 @@ const stubFunction = () => undefined
 describe('Scrapers', () => {
     const appObjectsMock = {
         config: {
-            scrapers: ['scraperA', 'scraperB'],
             message: {
-                maxLines: 30,
                 descriptionMaxLength: 100,
+                maxLines: 30,
             },
+            scrapers: ['scraperA', 'scraperB'],
         },
 
         logger: {

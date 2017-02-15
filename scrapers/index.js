@@ -19,7 +19,7 @@ const DOTS_CHARACTER_CODE = 8230
 const DOTS_CHARACTER = String.fromCharCode(DOTS_CHARACTER_CODE)
 
 function flatten(arrays) {
-    return [].concat.apply([], arrays)
+    return [].concat(...arrays)
 }
 
 function filterDescription(text, config) {
@@ -84,7 +84,7 @@ function mergeAndFormatResults(results, appObjects) {
     const updatedResults = flatten(results)
         .map(([bot, description]) => [
             bot.toLowerCase(),
-            filterDescription(description, config)
+            filterDescription(description, config),
         ])
         .filter(botAndDescription => botAndDescription[0].endsWith(BOT_POSTFIX))
 

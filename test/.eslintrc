@@ -2,6 +2,9 @@ env:
   jasmine: true
 rules:
   no-magic-numbers: off
+  max-nested-callbacks:
+    - warn
+    - max: 6
   max-statements:
     - warn
     - max: 30
