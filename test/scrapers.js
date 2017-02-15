@@ -20,7 +20,7 @@ function makeOnCreatePageMock(results) {
 const onCreatePageMockEmpty = makeOnCreatePageMock([])
 
 const onCreatePageMockA = makeOnCreatePageMock([
-    ['Abot', ' Whitespace and @spam eggs http://domain.com  '],
+    ['Abot', ' Whitespace and @spam https://eggs.foo\nftp://bar http://domain.com \t '],
     ['Bbotty', 'Should not present in the output'],
     ['Cbot', 'Description will be overriden'],
     ['Dbot', 'Both name and description will be overriden'],
@@ -164,16 +164,73 @@ describe('Scrapers', () => {
                 .then(done)
         })
 
-        it('should remove URLs from description', () => {
-            assert.ok(false)
+        it('should remove URLs from description', done => {
+            const createPageCallbacks = {
+                scraperA: onCreatePageMockA,
+                scraperB: onCreatePageMockB,
+            }
+
+            const scrapers = new Scrapers(appObjectsMock, createPageCallbacks)
+            scrapers
+                .find('query')
+                .then(results => {
+                    assert.ok(Array.isArray(results))
+
+                    const hasUrls = results
+                        .filter(line =>
+                            line.includes('https://') ||
+                            line.includes('http://') ||
+                            line.includes('ftp://'))
+                        .length > 0
+
+                    assert.ok(!hasUrls)
+                })
+                .then(done)
         })
 
-        it('should remove @ from description', () => {
-            assert.ok(false)
+        it('should remove @ from description', done => {
+            const createPageCallbacks = {
+                scraperA: onCreatePageMockA,
+                scraperB: onCreatePageMockB,
+            }
+
+            const scrapers = new Scrapers(appObjectsMock, createPageCallbacks)
+            scrapers
+                .find('query')
+                .then(results => {
+                    assert.ok(Array.isArray(results))
+
+                    const hasAtChar = results
+                        .filter(line => line
+                            .slice(1)
+                            .includes('@'))
+                        .length > 0
+
+                    assert.ok(!hasAtChar)
+                })
+                .then(done)
         })
 
-        it('should remove new lines from description', () => {
-            assert.ok(false)
+        it('should remove new lines from description', done => {
+            const createPageCallbacks = {
+                scraperA: onCreatePageMockA,
+                scraperB: onCreatePageMockB,
+            }
+
+            const scrapers = new Scrapers(appObjectsMock, createPageCallbacks)
+            scrapers
+                .find('query')
+                .then(results => {
+                    assert.ok(Array.isArray(results))
+
+                    const hasNewLines = results
+                        .filter(line => line
+                            .includes('\n'))
+                        .length > 0
+
+                    assert.ok(!hasNewLines)
+                })
+                .then(done)
         })
 
         it('should sort by bot names', () => {
