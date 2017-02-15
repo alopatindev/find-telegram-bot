@@ -6,9 +6,6 @@ const logger = require('./logger.js')(config)
 const SearchEngines = require('./search-engines')
 const Telegraf = require('telegraf')
 
-const TEXT_WELCOME = 'Hi! Please type your search query!'
-const TEXT_FOUND_BOTS = 'Found bots: '
-
 const searchEngines = new SearchEngines(logger, config)
 const bot = new Telegraf(config.telegramBotToken)
 
@@ -28,7 +25,7 @@ function onNextReply(ctx, lines, index) {
 }
 
 bot.command('start', ctx => ctx
-    .reply(TEXT_WELCOME)
+    .reply(config.text.welcome)
     .catch(logger.error)
 )
 
@@ -43,13 +40,13 @@ bot.on('message', ctx => {
 
     if (query.length === 0) {
         ctx
-            .reply(TEXT_WELCOME)
+            .reply(config.text.welcome)
             .catch(logger.error)
     } else {
         searchEngines
             .find(query)
             .then(lines => ctx
-                .reply(`${TEXT_FOUND_BOTS}${lines.length}`)
+                .reply(`${config.text.foundBots}${lines.length}`)
                 .then(() => onNextReply(ctx, lines, 0))
                 .catch(logger.error)
             )

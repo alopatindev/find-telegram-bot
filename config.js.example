@@ -4,10 +4,15 @@ module.exports = {
     live: process.env.DEBUG !== '1',
     telegramBotToken: '',
 
+    scrapingTimeoutMs: 30000,
+
     message: {
         maxLines: 30,
         descriptionMaxLength: 100,
     },
 
-    scrapingTimeoutMs: 30000,
+    text: {
+        welcome: 'Hi! Please type your search query!',
+        foundBots: 'Found bots: ',
+    },
 }
