@@ -5,8 +5,13 @@ const phantomjs = require('phantom')
 const concatMaps = require('concat-maps')
 
 const commonScripts = require('./browser-scripts/common.js')
-const storebotScript = require('./browser-scripts/storebot.js')
-const tgramScript = require('./browser-scripts/tgram.js')
+const onStorebotCreatePage = require('./storebot-create-page.js')
+const onTgramCreatePage = require('./tgram-create-page.js')
+
+const onCreatePageCallbacks = {
+    storebot: onStorebotCreatePage,
+    tgram: onTgramCreatePage,
+}
 
 const USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1'
 const BOT_POSTFIX = 'bot'
@@ -54,6 +59,9 @@ function createPage(query, callback, appObjects) {
 
     return pagePromise
         .then(page => {
+            page.setting('userAgent', USER_AGENT)
+            page.property('onConsoleMessage', commonScripts.onConsoleMessage)
+
             const phantomObjects = {
                 instancePromise,
                 page,
@@ -62,127 +70,6 @@ function createPage(query, callback, appObjects) {
             return callback(query, phantomObjects, appObjects)
         })
         .catch(logger.error)
-}
-
-function onStorebotCreatePage(query, phantomObjects, appObjects) {
-    const {
-        page,
-        instancePromise,
-    } = phantomObjects
-
-    const {
-        logger,
-    } = appObjects
-
-    const baseUrl = 'https://storebot.me'
-    const url = encodeURI(`${baseUrl}/search?text=${query}`)
-
-    page.setting('userAgent', USER_AGENT)
-    page.property('onConsoleMessage', commonScripts.onConsoleMessage)
-
-    return page
-        .open(url)
-        .then(status => {
-            if (status !== 'success') {
-                throw new Error(`Failed to load '${url}' status=${status}`)
-            }
-        })
-        .then(() => {
-            const script = `function() { this.baseUrl = "${baseUrl}" }`
-            page.evaluateJavaScript(script)
-        })
-        .then(() => page.evaluate(storebotScript))
-        .then(result => {
-            // instance is phantom in phantom context
-            instancePromise
-                .then(instance => {
-                    logger.debug('exit instance')
-                    instance.exit()
-                })
-                .catch(logger.error)
-
-            // return the final result
-            return new Map(result)
-        })
-        .catch(e => {
-            logger.error(e)
-            instancePromise
-                .then(instance => {
-                    logger.debug('exit instance due to failure')
-                    instance.exit()
-                })
-                .catch(logger.error)
-            return new Map()
-        })
-}
-
-function onTgramCreatePage(query, phantomObjects, appObjects) {
-    const {
-        page,
-        instancePromise,
-    } = phantomObjects
-
-    const {
-        logger,
-        config,
-    } = appObjects
-
-    const shared = {}
-
-    const baseUrl = 'https://tgram.ru'
-    const url = encodeURI(`${baseUrl}/bots`)
-
-    page.setting('userAgent', USER_AGENT)
-    page.property('onConsoleMessage', commonScripts.onConsoleMessage)
-
-    page.on('onCallback', result => {
-        try {
-            instancePromise
-                .then(instance => {
-                    logger.debug('exit instance')
-                    instance.exit()
-                })
-                .catch(logger.error)
-
-            // return the final result
-            shared.onResolveResult(new Map(result))
-        } catch (e) {
-            logger.error(e)
-        }
-    })
-
-    const resultPromise = page
-        .open(url)
-        .then(() => {
-            const script = `function() { this.baseUrl = "${baseUrl}"; this.query = "${query}" }`
-            return page.evaluateJavaScript(script)
-        })
-        .then(() => page.evaluate(tgramScript))
-        .then(() =>
-            new Promise((resolve, reject) => {
-                shared.onResolveResult = resolve
-                shared.onRejectResult = reject
-                logger.debug(`set scraping timeout to ${config.scrapingTimeoutMs}`)
-                setTimeout(() => shared.onRejectResult(new Error('Scraping Timeout')), config.scrapingTimeoutMs)
-            })
-        )
-        .catch(e => {
-            logger.error(e)
-            instancePromise
-                .then(instance => {
-                    logger.debug('exit instance due to failure')
-                    instance.exit()
-                })
-                .catch(logger.error)
-            return new Map()
-        })
-
-    return resultPromise
-}
-
-const onCreatePageCallbacks = {
-    storebot: onStorebotCreatePage,
-    tgram: onTgramCreatePage,
 }
 
 class Scrapers {
