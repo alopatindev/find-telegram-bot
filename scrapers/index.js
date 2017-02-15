@@ -8,7 +8,7 @@ const commonScripts = require('./browser-scripts/common.js')
 const onStorebotCreatePage = require('./storebot-create-page.js')
 const onTgramCreatePage = require('./tgram-create-page.js')
 
-const onCreatePageCallbacks = {
+const defaultCreatePageCallbacks = {
     storebot: onStorebotCreatePage,
     tgram: onTgramCreatePage,
 }
@@ -19,7 +19,7 @@ const BOT_POSTFIX = 'bot'
 const DOTS_CHARACTER_CODE = 8230
 const DOTS_CHARACTER = String.fromCharCode(DOTS_CHARACTER_CODE)
 
-function filterText(text, config) {
+function filterDescription(text, config) {
     let result = text
         .trim()
         .replace(/[@\n]/g, '')
@@ -72,7 +72,7 @@ function createPage(query, callback, appObjects) {
         .catch(logger.error)
 }
 
-function mergeAndFormat(results, appObjects) {
+function mergeAndFormatResults(results, appObjects) {
     const {
         config,
         logger,
@@ -86,16 +86,22 @@ function mergeAndFormat(results, appObjects) {
             .toLowerCase()
             .endsWith(BOT_POSTFIX))
         .sort() // FIXME: compare bot names only
-        .map(([bot, description]) => `@${bot} — ${filterText(description, config)}`)
+        .map(([bot, description]) => `@${bot} — ${filterDescription(description, config)}`)
 
     logger.debug(`lines.length = ${lines.length}`)
 
     return lines
 }
 
+function findWithScraper(query, scraper, createPageCallbacks, appObjects) {
+    assert(createPageCallbacks.hasOwnProperty(scraper), `Unknown scraper "${scraper}"! Please check your config`)
+    return createPage(query, createPageCallbacks[scraper], appObjects)
+}
+
 class Scrapers {
-    constructor(appObjects) {
+    constructor(appObjects, createPageCallbacks = defaultCreatePageCallbacks) {
         this.appObjects = appObjects
+        this.createPageCallbacks = createPageCallbacks
     }
 
     /**
@@ -109,17 +115,12 @@ class Scrapers {
             .appObjects
             .config
             .scrapers
-            .map(scraper => this.findWith(scraper, query))
+            .map(scraper => findWithScraper(query, scraper, this.createPageCallbacks, this.appObjects))
 
         return Promise
             .all(scraperPromises)
-            .then(results => mergeAndFormat(results, this.appObjects))
+            .then(results => mergeAndFormatResults(results, this.appObjects))
             .catch(this.appObjects.logger.error)
-    }
-
-    findWith(scraper, query) {
-        assert(onCreatePageCallbacks.hasOwnProperty(scraper), `Unknown scraper "${scraper}"! Please check your config`)
-        return createPage(query, onCreatePageCallbacks[scraper], this.appObjects)
     }
 }
 
