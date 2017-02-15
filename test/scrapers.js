@@ -139,8 +139,29 @@ describe('Scrapers', () => {
                 .then(done)
         })
 
-        it('should trim description whitespace', () => {
-            assert.ok(false)
+        it('should trim description whitespace', done => {
+            const createPageCallbacks = {
+                scraperA: onCreatePageMockA,
+                scraperB: onCreatePageMockB,
+            }
+
+            const scrapers = new Scrapers(appObjectsMock, createPageCallbacks)
+            scrapers
+                .find('query')
+                .then(results => {
+                    assert.ok(Array.isArray(results))
+
+                    const hasWhitespace = results
+                        .filter(line =>
+                            line.startsWith(' ') ||
+                            line.endsWith(' ') ||
+                            line.startsWith('\t') ||
+                            line.endsWith('\t'))
+                        .length > 0
+
+                    assert.ok(!hasWhitespace)
+                })
+                .then(done)
         })
 
         it('should remove URLs from description', () => {

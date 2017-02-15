@@ -24,9 +24,9 @@ function flatten(arrays) {
 
 function filterDescription(text, config) {
     let result = text
-        .trim()
         .replace(/[@\n]/g, '')
         .replace(/(?:https?|ftp):\/\/[\n\S]+/g, '')
+        .trim()
 
     if (result.length > config.message.descriptionMaxLength) {
         result = result.slice(0, config.message.descriptionMaxLength)
