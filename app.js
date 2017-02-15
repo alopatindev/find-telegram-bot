@@ -3,10 +3,10 @@
 const config = require('./config.js')
 const logger = require('./logger.js')(config)
 
-const SearchEngines = require('./search-engines')
+const Scrapers = require('./scrapers')
 const Telegraf = require('telegraf')
 
-const searchEngines = new SearchEngines(logger, config)
+const scrapers = new Scrapers(config, logger)
 const bot = new Telegraf(config.telegramBotToken)
 
 function onNextReply(ctx, lines, index) {
@@ -43,7 +43,7 @@ bot.on('message', ctx => {
             .reply(config.text.welcome)
             .catch(logger.error)
     } else {
-        searchEngines
+        scrapers
             .find(query)
             .then(lines => ctx
                 .reply(`${config.text.foundBots}${lines.length}`)

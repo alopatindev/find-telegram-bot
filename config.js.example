@@ -2,7 +2,10 @@
 
 module.exports = {
     live: process.env.DEBUG !== '1',
+
     telegramBotToken: '',
+
+    scrapers: ['tgram', 'storebot'], // the last overrides description of the previous
 
     scrapingTimeoutMs: 30000,
 

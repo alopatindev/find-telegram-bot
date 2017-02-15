@@ -32,9 +32,9 @@ module.exports = function() {
     var result = []
 
     try {
-        console.debug('storeBotScript')
+        console.debug('storebotScript')
         result = script()
-        console.debug('storeBotScript end')
+        console.debug('storebotScript end')
     } catch (e) {
         console.error(e)
     }
