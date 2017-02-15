@@ -9,14 +9,28 @@ const Telegraf = require('telegraf')
 const TEXT_WELCOME = 'Hi! Please type your search query!'
 const TEXT_FOUND_BOTS = 'Found bots: '
 
-const MAX_MESSAGE_LINES = 25
-
 const searchEngines = new SearchEngines(logger, config)
 const bot = new Telegraf(config.telegramBotToken)
 
-bot.command('start', ctx => {
-    ctx.reply(TEXT_WELCOME).catch(logger.error)
-})
+function onNextReply(ctx, lines, index) {
+    if (index < lines.length) {
+        const nextIndex = index + config.message.maxLines
+
+        const message = lines
+            .slice(index, nextIndex)
+            .join('\n')
+
+        ctx
+            .reply(message)
+            .then(() => onNextReply(ctx, lines, nextIndex))
+            .catch(logger.error)
+    }
+}
+
+bot.command('start', ctx => ctx
+    .reply(TEXT_WELCOME)
+    .catch(logger.error)
+)
 
 bot.on('message', ctx => {
     const query = ctx
@@ -36,20 +50,7 @@ bot.on('message', ctx => {
             .find(query)
             .then(lines => ctx
                 .reply(`${TEXT_FOUND_BOTS}${lines.length}`)
-                .then(() => {
-                    function onNextReply(index) {
-                        if (index < lines.length) {
-                            const message = lines
-                                .slice(index, index + MAX_MESSAGE_LINES)
-                                .join('\n')
-                            ctx
-                                .reply(message)
-                                .then(() => onNextReply(index + MAX_MESSAGE_LINES))
-                                .catch(logger.error)
-                        }
-                    }
-                    onNextReply(0)
-                })
+                .then(() => onNextReply(ctx, lines, 0))
                 .catch(logger.error)
             )
             .catch(logger.error)

@@ -9,7 +9,6 @@ const tgramScript = require('./browser-scripts/tgram.js')
 
 const USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1'
 const BOT_POSTFIX = 'bot'
-const MAX_DESCRIPTION_LENGTH = 100
 
 const DOTS_CHARACTER_CODE = 8230
 const DOTS_CHARACTER = String.fromCharCode(DOTS_CHARACTER_CODE)
@@ -20,8 +19,8 @@ function filterText(text) {
         .replace(/[@\n]/g, '')
         .replace(/(?:https?|ftp):\/\/[\n\S]+/g, '')
 
-    if (result.length > MAX_DESCRIPTION_LENGTH) {
-        result = result.slice(0, MAX_DESCRIPTION_LENGTH)
+    if (result.length > this.config.message.descriptionMaxLength) {
+        result = result.slice(0, this.config.message.descriptionMaxLength)
         const hasDots = result.endsWith('...') || result.endsWith(DOTS_CHARACTER)
 
         if (!hasDots) {
@@ -79,6 +78,8 @@ function onStoreBotCreatePage(page, instancePromise, query) {
                     instance.exit()
                 })
                 .catch(this.logger.error)
+
+            // return the final result
             return new Map(result)
         })
         .catch(e => {
@@ -111,6 +112,7 @@ function onTgramCreatePage(page, instancePromise, query) {
                 })
                 .catch(self.logger.error)
 
+            // return the final result
             self.onResolveResult(new Map(result))
         } catch (e) {
             self.logger.error(e)
@@ -158,6 +160,7 @@ class SearchEngines {
      * @return {Promise} find
      */
     find(query) {
+        const self = this
         // TODO: if cached then get
         return Promise
             .all([this.findInTgram(query), this.findInStoreBot(query)])
@@ -165,9 +168,11 @@ class SearchEngines {
                 const mergedResults = concatMaps.concat(...results)
                 const lines = Array
                     .from(mergedResults)
-                    .filter(botAndDescription => botAndDescription[0].toLowerCase().endsWith(BOT_POSTFIX))
-                    .sort()
-                    .map(([bot, description]) => `@${bot} — ${filterText(description)}`)
+                    .filter(botAndDescription => botAndDescription[0]
+                        .toLowerCase()
+                        .endsWith(BOT_POSTFIX))
+                    .sort() // FIXME: compare bot names only
+                    .map(([bot, description]) => `@${bot} — ${filterText.bind(self)(description)}`)
                 this.logger.debug(`lines.length = ${lines.length}`)
                 return lines
             })
