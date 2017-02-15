@@ -19,10 +19,10 @@ function makeOnCreatePageMock(results) {
 const onCreatePageMockEmpty = makeOnCreatePageMock([])
 
 const onCreatePageMockA = makeOnCreatePageMock([
-    ['Abot', ' Whitespace and @spam https://eggs.foo\nftp://bar http://domain.com \t '],
+    ['Dbot', 'Both name and description will be overriden'],
     ['Bbotty', 'Should not present in the output'],
     ['Cbot', 'Description will be overriden'],
-    ['Dbot', 'Both name and description will be overriden'],
+    ['Abot', ' Whitespace and @spam https://eggs.foo\nftp://bar http://domain.com \t '],
 ])
 
 const onCreatePageMockB = makeOnCreatePageMock([
@@ -232,8 +232,26 @@ describe('Scrapers', () => {
                 .then(done)
         })
 
-        it('should sort by bot names', () => {
-            assert.ok(false)
+        it('should sort by bot names', done => {
+            const createPageCallbacks = {
+                scraperA: onCreatePageMockA,
+                scraperB: onCreatePageMockB,
+            }
+
+            const scrapers = new Scrapers(appObjectsMock, createPageCallbacks)
+            scrapers
+                .find('query')
+                .then(results => {
+                    assert.ok(Array.isArray(results))
+
+                    const botNames = results
+                        .map(line => line.match(/@(.*) —/)[1])
+
+                    const expect = ['abot', 'cbot', 'dbot']
+
+                    assert.deepStrictEqual(botNames, expect)
+                })
+                .then(done)
         })
     })
 })

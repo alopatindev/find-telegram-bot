@@ -92,7 +92,7 @@ function mergeAndFormatResults(results, appObjects) {
 
     const lines = Array
         .from(mergedResults)
-        .sort() // FIXME: compare bot names only
+        .sort()
         .map(([name, description]) => `@${name} — ${description}`)
 
     logger.debug(`lines.length = ${lines.length}`)
