@@ -37,14 +37,18 @@ bot.on('message', ctx => {
             .then(lines => ctx
                 .reply(`${TEXT_FOUND_BOTS}${lines.length}`)
                 .then(() => {
-                    for (let i = 0; i < lines.length; i += MAX_MESSAGE_LINES) {
-                        const message = lines
-                            .slice(i, i + MAX_MESSAGE_LINES)
-                            .join('\n')
-                        ctx
-                            .reply(message)
-                            .catch(logger.error)
+                    function onNextReply(index) {
+                        if (index < lines.length) {
+                            const message = lines
+                                .slice(index, index + MAX_MESSAGE_LINES)
+                                .join('\n')
+                            ctx
+                                .reply(message)
+                                .then(() => onNextReply(index + MAX_MESSAGE_LINES))
+                                .catch(logger.error)
+                        }
                     }
+                    onNextReply(0)
                 })
                 .catch(logger.error)
             )
