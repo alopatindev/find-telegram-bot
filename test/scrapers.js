@@ -4,8 +4,24 @@ const assert = require('assert')
 
 const Scrapers = require('../scrapers')
 
+function makeOnCreatePageMock(results) {
+    const callback = (query, phantomObjects, appObjects) => {
+        return new Promise(resolve => {
+            phantomObjects
+                .instancePromise
+                .then(instance => instance.exit())
+            resolve(results)
+        })
+    }
+
+    return callback
+}
+
+const onCreatePageEmptyMock = makeOnCreatePageMock(new Map())
+
+const stubFunction = () => undefined
+
 describe('Scrapers', () => {
-    const stubFunction = () => undefined
     const appObjectsMock = {
         config: {
             scrapers: ['scraperA', 'scraperB'],
@@ -14,15 +30,6 @@ describe('Scrapers', () => {
             debug: stubFunction,
             info: stubFunction,
         },
-    }
-
-    function onCreatePageEmptyMock(query, phantomObjects) {
-        return new Promise(resolve => {
-            phantomObjects
-                .instancePromise
-                .then(instance => instance.exit())
-            resolve(new Map())
-        })
     }
 
     describe('#find()', () => {
