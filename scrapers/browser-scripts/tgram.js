@@ -26,11 +26,13 @@ module.exports = function() {
                         return url.href.indexOf(botUrlPrefix) === 0
                     })
                     .map(function(url) {
-                        const botName = url
+                        const name = url
                             .href
                             .replace(botUrlPrefix, '')
-                        const description = url.innerText
-                        return [botName, description]
+
+                        const description = url.innerText // TODO: any filtering?
+
+                        return [name, description]
                     })
 
                 window.callPhantom(result) // runs onCallback

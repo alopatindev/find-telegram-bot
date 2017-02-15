@@ -82,18 +82,18 @@ function mergeAndFormatResults(results, appObjects) {
     } = appObjects
 
     const updatedResults = flatten(results)
-        .map(([bot, description]) => [
-            bot.toLowerCase(),
+        .map(([name, description]) => [
+            name.toLowerCase(),
             filterDescription(description, config),
         ])
-        .filter(botAndDescription => botAndDescription[0].endsWith(BOT_POSTFIX))
+        .filter(result => result[0].endsWith(BOT_POSTFIX))
 
     const mergedResults = new Map(updatedResults)
 
     const lines = Array
         .from(mergedResults)
         .sort() // FIXME: compare bot names only
-        .map(([bot, description]) => `@${bot} — ${description}`)
+        .map(([name, description]) => `@${name} — ${description}`)
 
     logger.debug(`lines.length = ${lines.length}`)
 

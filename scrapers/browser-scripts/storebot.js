@@ -17,7 +17,7 @@ module.exports = function() {
         return urls
             .toArray()
             .map(function(url, index) {
-                const botName = url
+                const name = url
                     .href
                     .replace(botUrlPrefix, '')
 
@@ -25,7 +25,7 @@ module.exports = function() {
                     .innerText
                     .trim())
 
-                return [botName, description]
+                return [name, description]
             })
     }
 
