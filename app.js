@@ -2,11 +2,15 @@
 
 const config = require('./config.js')
 const logger = require('./logger.js')(config)
+const appObjects = {
+    config,
+    logger,
+}
 
 const Scrapers = require('./scrapers')
 const Telegraf = require('telegraf')
 
-const scrapers = new Scrapers(config, logger)
+const scrapers = new Scrapers(appObjects)
 const bot = new Telegraf(config.telegramBotToken)
 
 function onNextReply(ctx, lines, index) {

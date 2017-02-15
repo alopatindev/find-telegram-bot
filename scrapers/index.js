@@ -72,10 +72,30 @@ function createPage(query, callback, appObjects) {
         .catch(logger.error)
 }
 
+function mergeAndFormat(results, appObjects) {
+    const {
+        config,
+        logger,
+    } = appObjects
+
+    const mergedResults = concatMaps.concat(...results)
+
+    const lines = Array
+        .from(mergedResults)
+        .filter(botAndDescription => botAndDescription[0]
+            .toLowerCase()
+            .endsWith(BOT_POSTFIX))
+        .sort() // FIXME: compare bot names only
+        .map(([bot, description]) => `@${bot} — ${filterText(description, config)}`)
+
+    logger.debug(`lines.length = ${lines.length}`)
+
+    return lines
+}
+
 class Scrapers {
-    constructor(config, logger) {
-        this.config = config
-        this.logger = logger
+    constructor(appObjects) {
+        this.appObjects = appObjects
     }
 
     /**
@@ -86,41 +106,20 @@ class Scrapers {
     find(query) {
         // TODO: if cached then get
         const scraperPromises = this
+            .appObjects
             .config
             .scrapers
             .map(scraper => this.findWith(scraper, query))
 
-        const self = this
-
         return Promise
             .all(scraperPromises)
-            .then(results => {
-                const mergedResults = concatMaps.concat(...results)
-
-                const lines = Array
-                    .from(mergedResults)
-                    .filter(botAndDescription => botAndDescription[0]
-                        .toLowerCase()
-                        .endsWith(BOT_POSTFIX))
-                    .sort() // FIXME: compare bot names only
-                    .map(([bot, description]) => `@${bot} — ${filterText(description, self.config)}`)
-
-                this.logger.debug(`lines.length = ${lines.length}`)
-
-                return lines
-            })
-            .catch(this.logger.error)
+            .then(results => mergeAndFormat(results, this.appObjects))
+            .catch(this.appObjects.logger.error)
     }
 
     findWith(scraper, query) {
         assert(onCreatePageCallbacks.hasOwnProperty(scraper), `Unknown scraper "${scraper}"! Please check your config`)
-
-        const appObjects = {
-            config: this.config,
-            logger: this.logger,
-        }
-
-        return createPage(query, onCreatePageCallbacks[scraper], appObjects)
+        return createPage(query, onCreatePageCallbacks[scraper], this.appObjects)
     }
 }
 
