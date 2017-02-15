@@ -1,0 +1,7 @@
+env:
+  jasmine: true
+rules:
+  no-magic-numbers: off
+  max-statements:
+    - warn
+    - max: 30
