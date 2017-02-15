@@ -2,7 +2,6 @@
 
 const assert = require('assert')
 const phantomjs = require('phantom')
-const concatMaps = require('concat-maps')
 
 const commonScripts = require('./browser-scripts/common.js')
 const onStorebotCreatePage = require('./storebot-create-page.js')
@@ -18,6 +17,10 @@ const BOT_POSTFIX = 'bot'
 
 const DOTS_CHARACTER_CODE = 8230
 const DOTS_CHARACTER = String.fromCharCode(DOTS_CHARACTER_CODE)
+
+function flatten(arrays) {
+    return [].concat.apply([], arrays)
+}
 
 function filterDescription(text, config) {
     let result = text
@@ -78,15 +81,19 @@ function mergeAndFormatResults(results, appObjects) {
         logger,
     } = appObjects
 
-    const mergedResults = concatMaps.concat(...results)
+    const updatedResults = flatten(results)
+        .map(([bot, description]) => [
+            bot.toLowerCase(),
+            filterDescription(description, config)
+        ])
+        .filter(botAndDescription => botAndDescription[0].endsWith(BOT_POSTFIX))
+
+    const mergedResults = new Map(updatedResults)
 
     const lines = Array
         .from(mergedResults)
-        .filter(botAndDescription => botAndDescription[0]
-            .toLowerCase()
-            .endsWith(BOT_POSTFIX))
         .sort() // FIXME: compare bot names only
-        .map(([bot, description]) => `@${bot} — ${filterDescription(description, config)}`)
+        .map(([bot, description]) => `@${bot} — ${description}`)
 
     logger.debug(`lines.length = ${lines.length}`)
 

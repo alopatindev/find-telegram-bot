@@ -28,7 +28,7 @@ module.exports = (query, phantomObjects, appObjects) => {
                 .catch(logger.error)
 
             // return the final result
-            shared.onResolveResult(new Map(result))
+            shared.onResolveResult(result)
         } catch (e) {
             logger.error(e)
         }
@@ -57,7 +57,7 @@ module.exports = (query, phantomObjects, appObjects) => {
                     instance.exit()
                 })
                 .catch(logger.error)
-            return new Map()
+            return []
         })
 
     return resultPromise

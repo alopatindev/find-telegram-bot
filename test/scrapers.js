@@ -17,19 +17,19 @@ function makeOnCreatePageMock(results) {
     return callback
 }
 
-const onCreatePageMockEmpty = makeOnCreatePageMock(new Map())
+const onCreatePageMockEmpty = makeOnCreatePageMock([])
 
-const onCreatePageMockA = makeOnCreatePageMock(new Map([
+const onCreatePageMockA = makeOnCreatePageMock([
     ['Abot', ' Whitespace and @spam eggs http://domain.com  '],
     ['Bbotty', 'Should not present in the output'],
     ['Cbot', 'Description will be overriden'],
     ['Dbot', 'Both name and description will be overriden'],
-]))
+])
 
-const onCreatePageMockB = makeOnCreatePageMock(new Map([
+const onCreatePageMockB = makeOnCreatePageMock([
     ['Cbot', 'New description'],
     ['dbot', 'New name and description'],
-]))
+])
 
 const stubFunction = () => undefined
 
@@ -50,7 +50,7 @@ describe('Scrapers', () => {
     }
 
     describe('#find()', () => {
-        it('should merge empty maps', done => {
+        it('should merge empty results', done => {
             const createPageCallbacks = {
                 scraperA: onCreatePageMockEmpty,
                 scraperB: onCreatePageMockEmpty,
@@ -58,7 +58,7 @@ describe('Scrapers', () => {
 
             const scrapers = new Scrapers(appObjectsMock, createPageCallbacks)
             scrapers
-                .find('hello')
+                .find('query')
                 .then(results => {
                     assert.ok(Array.isArray(results))
                     assert.strictEqual(results.length, 0)
@@ -74,18 +74,16 @@ describe('Scrapers', () => {
 
             const scrapers = new Scrapers(appObjectsMock, createPageCallbacks)
             scrapers
-                .find('hello')
+                .find('query')
                 .then(results => {
                     assert.ok(Array.isArray(results))
 
-                    console.log(results)
-
                     const hasOldDescriptions =
-                        results.includes('@Cbot — Description will be overriden') ||
-                        results.includes('@Dbot — Both name and description will be overriden')
+                        results.includes('@cbot — Description will be overriden') ||
+                        results.includes('@dbot — Both name and description will be overriden')
 
                     const hasNewDescriptions =
-                        results.includes('@Cbot — New description') &&
+                        results.includes('@cbot — New description') &&
                         results.includes('@dbot — New name and description')
 
                     assert.ok(!hasOldDescriptions)
@@ -94,7 +92,7 @@ describe('Scrapers', () => {
                 .then(done)
         })
 
-        it('should ignore bots names case-sensitivity', done => {
+        it('should have case-insensitive bot names', done => {
             const createPageCallbacks = {
                 scraperA: onCreatePageMockA,
                 scraperB: onCreatePageMockB,
@@ -102,7 +100,7 @@ describe('Scrapers', () => {
 
             const scrapers = new Scrapers(appObjectsMock, createPageCallbacks)
             scrapers
-                .find('hello')
+                .find('query')
                 .then(results => {
                     assert.ok(Array.isArray(results))
 
@@ -128,7 +126,7 @@ describe('Scrapers', () => {
 
             const scrapers = new Scrapers(appObjectsMock, createPageCallbacks)
             scrapers
-                .find('hello')
+                .find('query')
                 .then(results => {
                     assert.ok(Array.isArray(results))
 
@@ -141,14 +139,24 @@ describe('Scrapers', () => {
                 .then(done)
         })
 
-        it('should sort by bot names', () => {})
+        it('should trim description whitespace', () => {
+            assert.ok(false)
+        })
 
-        it('should trim description whitespace', () => {})
+        it('should remove URLs from description', () => {
+            assert.ok(false)
+        })
 
-        it('should remove URLs from description', () => {})
+        it('should remove @ from description', () => {
+            assert.ok(false)
+        })
 
-        it('should remove @ from description', () => {})
+        it('should remove new lines from description', () => {
+            assert.ok(false)
+        })
 
-        it('should remove new lines from description', () => {})
+        it('should sort by bot names', () => {
+            assert.ok(false)
+        })
     })
 })

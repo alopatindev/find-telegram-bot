@@ -37,7 +37,7 @@ module.exports = (query, phantomObjects, appObjects) => {
                 .catch(logger.error)
 
             // return the final result
-            return new Map(result)
+            return result
         })
         .catch(e => {
             logger.error(e)
@@ -47,6 +47,6 @@ module.exports = (query, phantomObjects, appObjects) => {
                     instance.exit()
                 })
                 .catch(logger.error)
-            return new Map()
+            return []
         })
 }
