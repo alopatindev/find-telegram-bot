@@ -20,7 +20,11 @@ module.exports = function() {
                 const botName = url
                     .href
                     .replace(botUrlPrefix, '')
-                const description = htmlDecode(descriptions[index].innerText.trim())
+
+                const description = htmlDecode(descriptions[index]
+                    .innerText
+                    .trim())
+
                 return [botName, description]
             })
     }

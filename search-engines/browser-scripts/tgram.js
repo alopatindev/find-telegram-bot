@@ -25,7 +25,7 @@ module.exports = function() {
                     .filter(function(url) {
                         return url.href.indexOf(botUrlPrefix) === 0
                     })
-                    .map(function(url, index) {
+                    .map(function(url) {
                         const botName = url
                             .href
                             .replace(botUrlPrefix, '')

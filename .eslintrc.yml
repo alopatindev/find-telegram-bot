@@ -55,7 +55,7 @@ rules:
   no-global-assign: error
   no-implicit-coercion: warn
   no-implicit-globals: warn
-  no-invalid-this: error
+  no-invalid-this: off
   no-lone-blocks: warn
   no-loop-func: warn
   no-magic-numbers:
@@ -123,7 +123,9 @@ rules:
   comma-spacing: warn
   comma-style: warn
   computed-property-spacing: warn
-  consistent-this: error
+  consistent-this:
+    - error
+    - self
   func-call-spacing: warn
   func-name-matching: warn
   func-names: warn
