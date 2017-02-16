@@ -10,7 +10,6 @@
 const assert = require('assert')
 const phantomjs = require('phantom')
 
-const commonScripts = require('./browser-scripts/common.js')
 const onStorebotCreatePage = require('./storebot-create-page.js')
 const onTgramCreatePage = require('./tgram-create-page.js')
 
@@ -69,10 +68,19 @@ function createPage(query, callback, appObjects) {
     return pagePromise
         .then(page => {
             page.setting('userAgent', USER_AGENT)
-            page.property('onConsoleMessage', commonScripts.onConsoleMessage)
+            page.on('onConsoleMessage', logger.debug)
+
+            const openThrowable = url => page
+                .open(url)
+                .then(status => {
+                    if (status !== 'success') {
+                        throw new Error(`Failed to load '${url}' status=${status}`)
+                    }
+                })
 
             const phantomObjects = {
                 instancePromise,
+                openThrowable,
                 page,
             }
 

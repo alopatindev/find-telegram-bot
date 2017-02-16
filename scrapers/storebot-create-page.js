@@ -12,6 +12,7 @@ const storebotScript = require('./browser-scripts/storebot.js')
 module.exports = (query, phantomObjects, appObjects) => {
     const {
         page,
+        openThrowable,
         instancePromise,
     } = phantomObjects
 
@@ -22,13 +23,7 @@ module.exports = (query, phantomObjects, appObjects) => {
     const baseUrl = 'https://storebot.me'
     const url = encodeURI(`${baseUrl}/search?text=${query}`)
 
-    return page
-        .open(url)
-        .then(status => {
-            if (status !== 'success') {
-                throw new Error(`Failed to load '${url}' status=${status}`)
-            }
-        })
+    const resultPromise = openThrowable(url)
         .then(() => {
             const script = `function() { this.baseUrl = "${baseUrl}" }`
             page.evaluateJavaScript(script)
@@ -56,4 +51,6 @@ module.exports = (query, phantomObjects, appObjects) => {
                 .catch(logger.error)
             return []
         })
+
+    return resultPromise
 }

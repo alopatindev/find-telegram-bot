@@ -12,6 +12,7 @@ const tgramScript = require('./browser-scripts/tgram.js')
 module.exports = (query, phantomObjects, appObjects) => {
     const {
         page,
+        openThrowable,
         instancePromise,
     } = phantomObjects
 
@@ -41,8 +42,7 @@ module.exports = (query, phantomObjects, appObjects) => {
         }
     })
 
-    const resultPromise = page
-        .open(url)
+    const resultPromise = openThrowable(url)
         .then(() => {
             const script = `function() { this.baseUrl = "${baseUrl}"; this.query = "${query}" }`
             return page.evaluateJavaScript(script)
