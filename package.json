@@ -6,9 +6,10 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "test": "./node_modules/.bin/eslint . && ./node_modules/.bin/mocha --full-trace test",
-    "debug": "DEBUG=1 ./node_modules/.bin/nodemon --trace-warnings ./app.js",
-    "start": "./node_modules/.bin/nodemon ./app.js"
+    "test": "eslint . && mocha --full-trace test",
+    "coverage": "istanbul cover node_modules/mocha/bin/_mocha && codecov",
+    "debug": "DEBUG=1 nodemon --trace-warnings ./app.js",
+    "start": "nodemon ./app.js"
   },
   "dependencies": {
     "nodemon": "^1.11.0",
@@ -17,7 +18,9 @@
     "winston": "^2.3.1"
   },
   "devDependencies": {
+    "codecov": "^1.0.1",
     "eslint": "^3.15.0",
+    "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
     "quickcheck": "0.0.4"
   }
