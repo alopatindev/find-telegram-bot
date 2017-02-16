@@ -19,4 +19,9 @@ find-telegram-bot
 
 [@FindTelegramBot](https://t.me/FindTelegramBot) — search Telegram Bots with another Telegram Bot
 
+Uses
+- NodeJS
+- PhantomJS
+- Telegraf
+
 Licensed under the terms of MIT (read [LICENSE.txt](LICENSE.txt) for details)
