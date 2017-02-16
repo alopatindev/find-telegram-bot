@@ -162,8 +162,7 @@ describe('Scrapers', () => {
             assert.ok(Array.isArray(results))
 
             const hasNewLines = results
-                .filter(line => line
-                    .includes('\n'))
+                .filter(line => line.includes('\n'))
                 .length > 0
 
             assert.ok(!hasNewLines)
