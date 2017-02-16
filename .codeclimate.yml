@@ -1,7 +1,13 @@
-eslint:
-  enabled: true
-  channel: 'eslint-3'
-  config: .eslintrc.yml
+engines:
+  eslint:
+    enabled: true
+    channel: 'eslint-3'
+    config: .eslintrc.yml
+  duplication:
+    enabled: true
+    config:
+      languages:
+        - javascript
 
 ratings:
   paths:
