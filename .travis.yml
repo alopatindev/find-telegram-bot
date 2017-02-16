@@ -1,9 +1,5 @@
 sudo: false
 
-addons:
-  code_climate:
-    repo_token: 5940424b257d7a1d826d6bbfb8d935c9109af7c4fec45782ee4e092e3258ead0
-
 language: node_js
 
 node_js:
