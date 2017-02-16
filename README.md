@@ -6,9 +6,9 @@ find-telegram-bot
 
 [![Build Status](https://api.travis-ci.org/alopatindev/find-telegram-bot.svg?branch=master)](https://travis-ci.org/alopatindev/find-telegram-bot)
 [![Build Status](https://semaphoreci.com/api/v1/alopatindev/find-telegram-bot/branches/master/shields_badge.svg)](https://semaphoreci.com/alopatindev/find-telegram-bot)
+![Build Status](https://app.codeship.com/projects/d4379550-d625-0134-2bdf-72577a1b342e/status?branch=master)
 
 [![codecov.io](http://codecov.io/github/alopatindev/find-telegram-bot/coverage.svg?branch=master)](https://codecov.io/github/alopatindev/find-telegram-bot?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/alopatindev/find-telegram-bot/badge.svg?branch=master)](https://coveralls.io/github/alopatindev/find-telegram-bot?branch=master)
 
 [![Dependency Status](https://www.versioneye.com/user/projects/58a4f74eb4d2a20055fcb820/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/58a4f74eb4d2a20055fcb820)
 [![Dependency Status](https://david-dm.org/alopatindev/find-telegram-bot.svg)](https://david-dm.org/alopatindev/find-telegram-bot)
