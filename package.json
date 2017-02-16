@@ -5,6 +5,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "private": false,
+  "engines": {
+    "node": ">=6.9.4"
+  },
   "scripts": {
     "test": "eslint . && mocha --full-trace test",
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha && codecov",
