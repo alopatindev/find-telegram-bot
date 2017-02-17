@@ -9,13 +9,7 @@
 
 const tgramScript = require('./browser-scripts/tgram.js')
 
-module.exports = (query, phantomObjects, appObjects) => {
-    const {
-        page,
-        openThrowable,
-        instancePromise,
-    } = phantomObjects
-
+module.exports = (query, phantomUtils, appObjects) => {
     const {
         logger,
         config,
@@ -26,28 +20,20 @@ module.exports = (query, phantomObjects, appObjects) => {
     const baseUrl = 'https://tgram.ru'
     const url = encodeURI(`${baseUrl}/bots`)
 
-    page.on('onCallback', result => {
-        try {
-            instancePromise
-                .then(instance => {
-                    logger.debug('exit instance')
-                    instance.exit()
-                })
-                .catch(logger.error)
+    phantomUtils.setOnCallback(result => {
+        phantomUtils.exit()
 
-            // return the final result
-            shared.onResolveResult(result)
-        } catch (e) {
-            logger.error(e)
-        }
+        // return the final result
+        shared.onResolveResult(result)
     })
 
-    const resultPromise = openThrowable(url)
-        .then(() => {
-            const script = `function() { this.baseUrl = "${baseUrl}"; this.query = "${query}" }`
-            return page.evaluateJavaScript(script)
-        })
-        .then(() => page.evaluate(tgramScript))
+    const scripts = [
+        `function() { this.baseUrl = "${baseUrl}"; this.query = "${query}" }`,
+        tgramScript,
+    ]
+
+    const resultPromise = phantomUtils
+        .openAndRun(url, scripts)
         .then(() => new Promise((resolve, reject) => {
             shared.onResolveResult = resolve
             shared.onRejectResult = reject
@@ -55,13 +41,7 @@ module.exports = (query, phantomObjects, appObjects) => {
             setTimeout(() => shared.onRejectResult(new Error('Scraping Timeout')), config.scrapingTimeoutMs)
         }))
         .catch(e => {
-            logger.error(e)
-            instancePromise
-                .then(instance => {
-                    logger.debug('exit instance due to failure')
-                    instance.exit()
-                })
-                .catch(logger.error)
+            phantomUtils.exit(e)
             return []
         })
 

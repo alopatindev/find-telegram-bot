@@ -9,46 +9,23 @@
 
 const storebotScript = require('./browser-scripts/storebot.js')
 
-module.exports = (query, phantomObjects, appObjects) => {
-    const {
-        page,
-        openThrowable,
-        instancePromise,
-    } = phantomObjects
-
-    const {
-        logger,
-    } = appObjects
-
+module.exports = (query, phantomUtils) => {
     const baseUrl = 'https://storebot.me'
     const url = encodeURI(`${baseUrl}/search?text=${query}`)
 
-    const resultPromise = openThrowable(url)
-        .then(() => {
-            const script = `function() { this.baseUrl = "${baseUrl}" }`
-            page.evaluateJavaScript(script)
-        })
-        .then(() => page.evaluate(storebotScript))
-        .then(result => {
-            // instance is phantom in phantom context
-            instancePromise
-                .then(instance => {
-                    logger.debug('exit instance')
-                    instance.exit()
-                })
-                .catch(logger.error)
+    const scripts = [
+        `function() { this.baseUrl = "${baseUrl}" }`,
+        storebotScript.toString(),
+    ]
 
-            // return the final result
-            return result
+    const resultPromise = phantomUtils
+        .openAndRun(url, scripts)
+        .then(result => {
+            phantomUtils.exit()
+            return result // return the final result
         })
         .catch(e => {
-            logger.error(e)
-            instancePromise
-                .then(instance => {
-                    logger.debug('exit instance due to failure')
-                    instance.exit()
-                })
-                .catch(logger.error)
+            phantomUtils.exit(e)
             return []
         })
 

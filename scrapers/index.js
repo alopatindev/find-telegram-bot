@@ -46,6 +46,54 @@ function filterDescription(text, config) {
     return result
 }
 
+class PhantomUtils {
+    constructor(page, instancePromise, logger) {
+        this.page = page
+        this.instancePromise = instancePromise
+        this.logger = logger
+    }
+
+    openAndRun(url, scripts) {
+        return this.page
+            .open(url)
+            .then(status => {
+                assert.strictEqual(status, 'success', `Failed to load '${url}' status=${status}`)
+                assert(scripts.length > 0, 'You need to provide a script')
+                const results = scripts.map(script => this.page.evaluateJavaScript(script))
+                const lastResult = results[results.length - 1]
+                return lastResult
+            })
+    }
+
+    exit(error) {
+        const failed = error !== undefined
+
+        if (failed) {
+            this.logger.error(error)
+        }
+
+        this.instancePromise
+            .then(instance => {
+                // instance is phantom in phantom context
+                const reason = failed ? ' due to failure' : ''
+                const message = ['exit instance', reason].join('')
+                this.logger.debug(message)
+                instance.exit()
+            })
+            .catch(this.logger.error)
+    }
+
+    setOnCallback(callback) {
+        this.page.on('onCallback', result => {
+            try {
+                callback(result)
+            } catch (e) {
+                this.logger.error(e)
+            }
+        })
+    }
+}
+
 function createPage(query, callback, appObjects) {
     const {
         logger,
@@ -70,21 +118,8 @@ function createPage(query, callback, appObjects) {
             page.setting('userAgent', USER_AGENT)
             page.on('onConsoleMessage', logger.debug)
 
-            const openThrowable = url => page
-                .open(url)
-                .then(status => {
-                    if (status !== 'success') {
-                        throw new Error(`Failed to load '${url}' status=${status}`)
-                    }
-                })
-
-            const phantomObjects = {
-                instancePromise,
-                openThrowable,
-                page,
-            }
-
-            return callback(query, phantomObjects, appObjects)
+            const phantomUtils = new PhantomUtils(page, instancePromise, logger)
+            return callback(query, phantomUtils, appObjects)
         })
         .catch(logger.error)
 }

@@ -75,12 +75,12 @@ function testScrapers(createPageCallbacks, done, testClosure) {
 describe('Scrapers', () => {
     describe('#find()', () => {
         it('should merge empty results', done => testScrapers(createPageCallbacksStub, done, results => {
-            assert.ok(Array.isArray(results))
+            assert(Array.isArray(results))
             assert.strictEqual(results.length, 0)
         }))
 
         it('should override previous descriptions', done => testScrapers(createPageCallbacksMock, done, results => {
-            assert.ok(Array.isArray(results))
+            assert(Array.isArray(results))
 
             const hasOldDescriptions =
                 results.includes('@cbot — Description will be overriden') ||
@@ -90,12 +90,12 @@ describe('Scrapers', () => {
                 results.includes('@cbot — New description') &&
                 results.includes('@dbot — New name and description')
 
-            assert.ok(!hasOldDescriptions)
-            assert.ok(hasNewDescriptions)
+            assert(!hasOldDescriptions)
+            assert(hasNewDescriptions)
         }))
 
         it('should have case-insensitive bot names', done => testScrapers(createPageCallbacksMock, done, results => {
-            assert.ok(Array.isArray(results))
+            assert(Array.isArray(results))
 
             const hasOldNames = results
                 .filter(line => line.startsWith('@Dbot'))
@@ -105,22 +105,22 @@ describe('Scrapers', () => {
                 .filter(line => line.startsWith('@dbot'))
                 .length === 1
 
-            assert.ok(!hasOldNames)
-            assert.ok(hasNewName)
+            assert(!hasOldNames)
+            assert(hasNewName)
         }))
 
         it('should contain only bot names with postfix "bot"', done => testScrapers(createPageCallbacksMock, done, results => {
-            assert.ok(Array.isArray(results))
+            assert(Array.isArray(results))
 
             const nameHasPostfixBot = results
                 .filter(line => /^@.*bot — .*$/.test(line))
                 .length === results.length
 
-            assert.ok(nameHasPostfixBot)
+            assert(nameHasPostfixBot)
         }))
 
         it('should trim description whitespace', done => testScrapers(createPageCallbacksMock, done, results => {
-            assert.ok(Array.isArray(results))
+            assert(Array.isArray(results))
 
             const hasWhitespace = results
                 .filter(line =>
@@ -130,11 +130,11 @@ describe('Scrapers', () => {
                     line.endsWith('\t'))
                 .length > 0
 
-            assert.ok(!hasWhitespace)
+            assert(!hasWhitespace)
         }))
 
         it('should remove URLs from description', done => testScrapers(createPageCallbacksMock, done, results => {
-            assert.ok(Array.isArray(results))
+            assert(Array.isArray(results))
 
             const hasUrls = results
                 .filter(line =>
@@ -143,11 +143,11 @@ describe('Scrapers', () => {
                     line.includes('ftp://'))
                 .length > 0
 
-            assert.ok(!hasUrls)
+            assert(!hasUrls)
         }))
 
         it('should remove @ from description', done => testScrapers(createPageCallbacksMock, done, results => {
-            assert.ok(Array.isArray(results))
+            assert(Array.isArray(results))
 
             const hasAtChar = results
                 .filter(line => line
@@ -155,21 +155,21 @@ describe('Scrapers', () => {
                     .includes('@'))
                 .length > 0
 
-            assert.ok(!hasAtChar)
+            assert(!hasAtChar)
         }))
 
         it('should remove new lines from description', done => testScrapers(createPageCallbacksMock, done, results => {
-            assert.ok(Array.isArray(results))
+            assert(Array.isArray(results))
 
             const hasNewLines = results
                 .filter(line => line.includes('\n'))
                 .length > 0
 
-            assert.ok(!hasNewLines)
+            assert(!hasNewLines)
         }))
 
         it('should sort by bot names', done => testScrapers(createPageCallbacksMock, done, results => {
-            assert.ok(Array.isArray(results))
+            assert(Array.isArray(results))
 
             const botNames = results
                 .map(line => line.match(/@(.*) —/)[1])
