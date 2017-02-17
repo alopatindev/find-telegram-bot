@@ -46,6 +46,13 @@ function filterDescription(text, config) {
     return result
 }
 
+function isValidNameAndDescription(value) {
+    const [name, description] = value
+    const nameHasWhitespace = name.includes(' ') || name.includes('\t')
+    const descriptionIsEmpty = description.length === 0
+    return name.endsWith(BOT_POSTFIX) && !nameHasWhitespace && !descriptionIsEmpty
+}
+
 class PhantomUtils {
     constructor(page, instancePromise, logger) {
         this.page = page
@@ -132,10 +139,10 @@ function mergeAndFormatResults(results, appObjects) {
 
     const updatedResults = flatten(results)
         .map(([name, description]) => [
-            name.toLowerCase(),
+            name.toLowerCase().trim(),
             filterDescription(description, config),
         ])
-        .filter(result => result[0].endsWith(BOT_POSTFIX))
+        .filter(isValidNameAndDescription)
 
     const mergedResults = new Map(updatedResults)
 

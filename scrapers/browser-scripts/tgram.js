@@ -37,7 +37,7 @@ module.exports = function() {
                             .href
                             .replace(botUrlPrefix, '')
 
-                        const description = url.innerText // TODO: any filtering?
+                        const description = url.innerText
 
                         return [name, description]
                     })
