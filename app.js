@@ -17,6 +17,16 @@ const appObjects = {
 const Scrapers = require('./scrapers')
 const Telegraf = require('telegraf')
 
+function onExit(signal) {
+    logger.info(`Exiting due to ${signal}`)
+    process.exit(0)
+}
+
+for (const signal of ['SIGINT', 'SIGTERM']) {
+    logger.debug(`Set ${signal} handler`)
+    process.on(signal, () => onExit(signal))
+}
+
 const scrapers = new Scrapers(appObjects)
 const bot = new Telegraf(config.telegramBotToken)
 
