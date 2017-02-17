@@ -30,11 +30,15 @@ const onCreatePageMockA = makeOnCreatePage([
     ['Bbotty', 'Should not present in the output'],
     ['Cbot', 'Description will be overriden'],
     ['Abot', ' Whitespace and @spam https://eggs.foo\nftp://bar http://domain.com \t '],
+    ['Ebot', ' \t\n '],
 ])
 
 const onCreatePageMockB = makeOnCreatePage([
     ['Cbot', 'New description'],
     ['dbot', 'New name and description'],
+    [' Fbot  ', 'Bot name will be trimmed'],
+    ['G bot', 'Will be removed because of invalid name'],
+    ['', 'Will be removed because of invalid name'],
 ])
 
 const createPageCallbacksStub = {
@@ -168,15 +172,47 @@ describe('Scrapers', () => {
             assert(!hasNewLines)
         }))
 
+        it('should contain non-empty bot names', done => testScrapers(createPageCallbacksMock, done, results => {
+            assert(Array.isArray(results))
+
+            const hasEmptyNames = results
+                .filter(line => /^@ —/.test(line))
+                .length > 0
+
+            assert(!hasEmptyNames)
+        }))
+
+        it('should contain non-empty descriptions', done => testScrapers(createPageCallbacksMock, done, results => {
+            assert(Array.isArray(results))
+
+            const hasEmptyDescriptions = results
+                .filter(line => /— $/.test(line))
+                .length > 0
+
+            assert(!hasEmptyDescriptions)
+        }))
+
+        it('should trim bot names', done => testScrapers(createPageCallbacksMock, done, results => {
+            assert(Array.isArray(results))
+
+            const hasNamesWithWhitespace = results
+                .filter(line =>
+                    line.startsWith('@ ') ||
+                    line.startsWith('@\t') ||
+                    line.includes('  —') ||
+                    line.includes('\t —'))
+                .length === results.length
+
+            assert(!hasNamesWithWhitespace)
+        }))
+
         it('should sort by bot names', done => testScrapers(createPageCallbacksMock, done, results => {
             assert(Array.isArray(results))
 
-            const botNames = results
-                .map(line => line.match(/@(.*) —/)[1])
+            const names = results.map(line => line.match(/@(.*) —/)[1])
+            const expect = ['abot', 'cbot', 'dbot', 'fbot']
 
-            const expect = ['abot', 'cbot', 'dbot']
-
-            assert.deepStrictEqual(botNames, expect)
+            assert.deepStrictEqual(names, expect)
         }))
     })
 })
