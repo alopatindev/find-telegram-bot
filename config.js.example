@@ -12,6 +12,8 @@ module.exports = {
 
     telegramBotToken: '',
 
+    logMaxSize: 1000000,
+
     scrapers: ['tgram', 'storebot'], // the last overrides description of the previous
 
     scrapingTimeoutMs: 30000,

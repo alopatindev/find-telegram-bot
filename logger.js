@@ -13,11 +13,12 @@ function logger(config) {
     const logger = new winston.Logger()
 
     logger.add(winston.transports.File, {
-        filename: 'logs/errors.log',
-        level: 'error',
+        filename: 'logs/find-telegram-bot.log',
+        level: 'info',
+        maxsize: config.logMaxSize,
     })
 
-    let level = 'error'
+    let level = 'info'
     if (config.live === false) {
         level = 'debug'
         logger.add(winston.transports.Console)

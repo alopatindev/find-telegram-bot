@@ -18,12 +18,12 @@ const Scrapers = require('./scrapers')
 const Telegraf = require('telegraf')
 
 function onExit(signal) {
-    logger.info(`Exiting due to ${signal}`)
+    logger.info(`exiting due to ${signal}`)
     process.exit(0)
 }
 
 for (const signal of ['SIGINT', 'SIGTERM']) {
-    logger.debug(`Set ${signal} handler`)
+    logger.debug(`set ${signal} handler`)
     process.on(signal, () => onExit(signal))
 }
 
@@ -76,3 +76,5 @@ bot.on('message', ctx => {
 })
 
 bot.startPolling()
+
+logger.info('started')
