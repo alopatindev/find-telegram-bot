@@ -104,7 +104,7 @@ rules:
   no-use-before-define:
     - error
     - functions: false
-  callback-return: warn
+  callback-return: off
   global-require: warn
   handle-callback-err: warn
   no-mixed-requires: error
