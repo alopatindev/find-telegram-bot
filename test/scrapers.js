@@ -9,7 +9,7 @@
 
 const assert = require('assert')
 
-const Scrapers = require('../scrapers')
+const Scrapers = require('../bot/scrapers')
 
 function makeOnCreatePage(results) {
     const callback = (query, phantomObjects) => new Promise(resolve => {

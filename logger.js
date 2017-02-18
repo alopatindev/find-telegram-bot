@@ -13,9 +13,9 @@ function logger(config) {
     const logger = new winston.Logger()
 
     logger.add(winston.transports.File, {
-        filename: 'logs/find-telegram-bot.log',
+        filename: config.log.file,
         level: 'info',
-        maxsize: config.logMaxSize,
+        maxsize: config.log.maxSize,
     })
 
     let level = 'info'

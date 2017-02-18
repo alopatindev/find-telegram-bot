@@ -111,7 +111,7 @@ rules:
   no-new-require: warn
   no-path-concat: warn
   no-process-env: warn
-  no-process-exit: error
+  no-process-exit: off
   no-sync: warn
   array-bracket-spacing: warn
   block-spacing: warn
