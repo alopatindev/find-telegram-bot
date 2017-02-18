@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "eslint . && mocha --full-trace --timeout 5000 test",
-    "coverage": "istanbul cover node_modules/mocha/bin/_mocha && codecov",
+    "coverage": "istanbul cover -v node_modules/mocha/bin/_mocha && codecov",
     "debug": "DEBUG=1 nodemon --trace-warnings ./app.js",
     "start": "node ./app.js"
   },
