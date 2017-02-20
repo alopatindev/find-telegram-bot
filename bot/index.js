@@ -9,7 +9,7 @@
 
 const Telegraf = require('telegraf')
 
-const Scrapers = require('./scrapers')
+const ScraperFacade = require('./scrapers/scraper-facade.js')
 
 function createBot(appObjects) {
     const {
@@ -17,7 +17,7 @@ function createBot(appObjects) {
         logger,
     } = appObjects
 
-    const scrapers = new Scrapers(appObjects)
+    const scraperFacade = new ScraperFacade(appObjects)
     const bot = new Telegraf(config.telegramBotToken)
 
     function onNextReply(ctx, lines, index) {
@@ -54,7 +54,7 @@ function createBot(appObjects) {
                 .reply(config.text.welcome)
                 .catch(logger.error)
         } else {
-            scrapers
+            scraperFacade
                 .find(query)
                 .then(lines => ctx
                     .reply(`${config.text.foundBots}${lines.length}`)

@@ -9,11 +9,12 @@
 
 const assert = require('assert')
 
-const Scrapers = require('../bot/scrapers')
+const Scraper = require('../bot/scrapers/scraper.js')
+const ScraperFacade = require('../bot/scrapers/scraper-facade.js')
 
 function makeOnCreatePage(results) {
-    const callback = (query, phantomObjects) => new Promise(resolve => {
-        phantomObjects
+    const callback = (query, phantomUtils) => new Promise(resolve => {
+        phantomUtils
             .instancePromise
             .then(instance => instance.exit())
 
@@ -23,37 +24,53 @@ function makeOnCreatePage(results) {
     return callback
 }
 
-const onCreatePageStub = makeOnCreatePage([])
-
-const onCreatePageMockA = makeOnCreatePage([
-    ['Dbot', 'Both name and description will be overriden'],
-    ['Bbotty', 'Should not present in the output'],
-    ['Cbot', 'Description will be overriden'],
-    ['Abot', ' Whitespace and @spam https://eggs.foo\nftp://bar http://domain.com \t '],
-    ['Ebot', ' \t\n '],
-])
-
-const onCreatePageMockB = makeOnCreatePage([
-    ['Cbot', 'New description'],
-    ['dbot', 'New name and description'],
-    [' Fbot  ', 'Bot name will be trimmed'],
-    ['G bot', 'Will be removed because of invalid name'],
-    ['', 'Will be removed because of invalid name'],
-])
-
-const createPageCallbacksStub = {
-    scraperA: onCreatePageStub,
-    scraperB: onCreatePageStub,
+class StubScraper extends Scraper {
+    onCreatePage(query, phantomUtils, appObjects) {
+        return makeOnCreatePage([])(query, phantomUtils, appObjects)
+    }
 }
 
-const createPageCallbacksMock = {
-    scraperA: onCreatePageMockA,
-    scraperB: onCreatePageMockB,
+class MockAScraper extends Scraper {
+    onCreatePage(query, phantomUtils, appObjects) {
+        return makeOnCreatePage([
+            ['Dbot', 'Both name and description will be overriden'],
+            ['Bbotty', 'Should not present in the output'],
+            ['Cbot', 'Description will be overriden'],
+            ['Abot', ' Whitespace and @spam https://eggs.foo\nftp://bar http://domain.com \t '],
+            ['Ebot', ' \t\n '],
+        ])(query, phantomUtils, appObjects)
+    }
+}
+
+class MockBScraper extends Scraper {
+    onCreatePage(query, phantomUtils, appObjects) {
+        return makeOnCreatePage([
+            ['Cbot', 'New description'],
+            ['dbot', 'New name and description'],
+            [' Fbot  ', 'Bot name will be trimmed'],
+            ['G bot', 'Will be removed because of invalid name'],
+            ['', 'Will be removed because of invalid name'],
+        ])(query, phantomUtils, appObjects)
+    }
+}
+
+function scrapersStub(appObjects) {
+    return {
+        scraperA: new StubScraper(appObjects),
+        scraperB: new StubScraper(appObjects),
+    }
+}
+
+function scrapersMock(appObjects) {
+    return {
+        scraperA: new MockAScraper(appObjects),
+        scraperB: new MockBScraper(appObjects),
+    }
 }
 
 const stubFunction = () => undefined
 
-function testScrapers(createPageCallbacks, done, testClosure) {
+function testScrapers(scrapers, done, testClosure) {
     const appObjectsMock = {
         config: {
             message: {
@@ -69,21 +86,21 @@ function testScrapers(createPageCallbacks, done, testClosure) {
         },
     }
 
-    const scrapers = new Scrapers(appObjectsMock, createPageCallbacks)
-    scrapers
+    const scraperFacade = new ScraperFacade(appObjectsMock, scrapers(appObjectsMock)) // FIXME
+    scraperFacade
         .find('query')
         .then(testClosure)
         .then(done)
 }
 
-describe('Scrapers', () => {
+describe('ScraperFacade', () => {
     describe('#find()', () => {
-        it('should merge empty results', done => testScrapers(createPageCallbacksStub, done, results => {
+        it('should merge empty results', done => testScrapers(scrapersStub, done, results => {
             assert(Array.isArray(results))
             assert.strictEqual(results.length, 0)
         }))
 
-        it('should override previous descriptions', done => testScrapers(createPageCallbacksMock, done, results => {
+        it('should override previous descriptions', done => testScrapers(scrapersMock, done, results => {
             assert(Array.isArray(results))
 
             const hasOldDescriptions =
@@ -98,7 +115,7 @@ describe('Scrapers', () => {
             assert(hasNewDescriptions)
         }))
 
-        it('should have case-insensitive bot names', done => testScrapers(createPageCallbacksMock, done, results => {
+        it('should have case-insensitive bot names', done => testScrapers(scrapersMock, done, results => {
             assert(Array.isArray(results))
 
             const hasOldNames = results
@@ -113,7 +130,7 @@ describe('Scrapers', () => {
             assert(hasNewName)
         }))
 
-        it('should contain only bot names with postfix "bot"', done => testScrapers(createPageCallbacksMock, done, results => {
+        it('should contain only bot names with postfix "bot"', done => testScrapers(scrapersMock, done, results => {
             assert(Array.isArray(results))
 
             const nameHasPostfixBot = results
@@ -123,7 +140,7 @@ describe('Scrapers', () => {
             assert(nameHasPostfixBot)
         }))
 
-        it('should trim description whitespace', done => testScrapers(createPageCallbacksMock, done, results => {
+        it('should trim description whitespace', done => testScrapers(scrapersMock, done, results => {
             assert(Array.isArray(results))
 
             const hasWhitespace = results
@@ -137,7 +154,7 @@ describe('Scrapers', () => {
             assert(!hasWhitespace)
         }))
 
-        it('should remove URLs from description', done => testScrapers(createPageCallbacksMock, done, results => {
+        it('should remove URLs from description', done => testScrapers(scrapersMock, done, results => {
             assert(Array.isArray(results))
 
             const hasUrls = results
@@ -150,7 +167,7 @@ describe('Scrapers', () => {
             assert(!hasUrls)
         }))
 
-        it('should remove @ from description', done => testScrapers(createPageCallbacksMock, done, results => {
+        it('should remove @ from description', done => testScrapers(scrapersMock, done, results => {
             assert(Array.isArray(results))
 
             const hasAtChar = results
@@ -162,7 +179,7 @@ describe('Scrapers', () => {
             assert(!hasAtChar)
         }))
 
-        it('should remove new lines from description', done => testScrapers(createPageCallbacksMock, done, results => {
+        it('should remove new lines from description', done => testScrapers(scrapersMock, done, results => {
             assert(Array.isArray(results))
 
             const hasNewLines = results
@@ -172,7 +189,7 @@ describe('Scrapers', () => {
             assert(!hasNewLines)
         }))
 
-        it('should contain non-empty bot names', done => testScrapers(createPageCallbacksMock, done, results => {
+        it('should contain non-empty bot names', done => testScrapers(scrapersMock, done, results => {
             assert(Array.isArray(results))
 
             const hasEmptyNames = results
@@ -182,7 +199,7 @@ describe('Scrapers', () => {
             assert(!hasEmptyNames)
         }))
 
-        it('should contain non-empty descriptions', done => testScrapers(createPageCallbacksMock, done, results => {
+        it('should contain non-empty descriptions', done => testScrapers(scrapersMock, done, results => {
             assert(Array.isArray(results))
 
             const hasEmptyDescriptions = results
@@ -192,7 +209,7 @@ describe('Scrapers', () => {
             assert(!hasEmptyDescriptions)
         }))
 
-        it('should trim bot names', done => testScrapers(createPageCallbacksMock, done, results => {
+        it('should trim bot names', done => testScrapers(scrapersMock, done, results => {
             assert(Array.isArray(results))
 
             const hasNamesWithWhitespace = results
@@ -206,7 +223,7 @@ describe('Scrapers', () => {
             assert(!hasNamesWithWhitespace)
         }))
 
-        it('should sort by bot names', done => testScrapers(createPageCallbacksMock, done, results => {
+        it('should sort by bot names', done => testScrapers(scrapersMock, done, results => {
             assert(Array.isArray(results))
 
             const names = results.map(line => line.match(/@(.*) —/)[1])
