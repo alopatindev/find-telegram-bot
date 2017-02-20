@@ -2,6 +2,9 @@ sudo: false
 
 language: node_js
 
+env:
+  - secure: "YbqyfiFRCxe5YCpG+7iUYrZnn3w9KwmiiH0Su4LW10brtmJ2gniSESUS2/e/91T9Z7d34t7h3lkTVfpOJ02kNFXAQ/PxsbwKu0zsUzs/uoDiuPSUc1Ozg5tZVagqm0rAIsiKWnzRHbk6OLNbZIfUlnmh9I2NmoqdPaUTIUIb1U3mj1fsB3S+2jUtJYLbVoSf7Vtl52Z3nYj0PNFcYMHuonAxxQ1xgylK9wf+suZeBDO1Wnz8RE1Z9I7Ixuxz17oDqpwi9APZxtgCwQkLh6TZ7+MlwDG08lbxdR8gG/TIIDDTTe9qQ2gLOjMIUg4HaYei78L6xGah0dC1lDJ2FHsNaG2WnMIGFP02RjnvlMKULt/keYJwiTmUZQZoahAv0ONNe3NbGzwVQH2nDR4y6jSISSmQd9SAEe1Z2oQ+xx0hN6apX9PVG+wfPQq72SGy2VHJqSMGt3GTO2TBmFCzC2r0GhAzNE0LEK4LjS0YBWQhvkyv0TEKvdepxASVrajjNF+6awGjqRioBC+bsLvQEwH2qkTXbW8oulpqZmNOwZu509DS+k21u6X2ewxBkjTVXn4sn0YuFfvL1scL/N1+7baRQ1H0J0YE3ncx8O1GczZ+2yfJqKCHSGlfmblrH9HTE8go9/kwqi+ihL/wsGRMM1ZOqvug8TxrhgknGy2a3LKAkek="
+
 node_js:
   - '6'
 
@@ -11,4 +14,8 @@ install:
 script:
   - npm run lint
   - npm test
+
+after_script:
+  - npm install -g codeclimate-test-reporter
   - npm run coverage
+  - codeclimate-test-reporter < ./coverage/lcov.info
