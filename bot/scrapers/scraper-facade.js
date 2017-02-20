@@ -96,7 +96,7 @@ class ScraperFacade {
             .appObjects
             .config
             .scrapers
-            .map(scraper => this.scrapers[scraper].find(query)) // FIXME
+            .map(scraper => this.scrapers[scraper].find(query))
 
         return Promise
             .all(scraperPromises)
