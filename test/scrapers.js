@@ -14,7 +14,7 @@ const ScraperFacade = require('../bot/scrapers/scraper-facade.js')
 
 const stubFunction = () => undefined
 
-function makeOnCreatePage(phantomUtils, results) {
+function createOnCreatePage(phantomUtils, results) {
     return new Promise(resolve => {
         phantomUtils
             .instancePromise
@@ -26,13 +26,13 @@ function makeOnCreatePage(phantomUtils, results) {
 
 class StubScraper extends Scraper {
     onCreatePage(query, phantomUtils) {
-        return makeOnCreatePage(phantomUtils, [])
+        return createOnCreatePage(phantomUtils, [])
     }
 }
 
 class MockAScraper extends Scraper {
     onCreatePage(query, phantomUtils) {
-        return makeOnCreatePage(phantomUtils, [
+        return createOnCreatePage(phantomUtils, [
             ['Dbot', 'Both name and description will be overriden'],
             ['Bbotty', 'Should not present in the output'],
             ['Cbot', 'Description will be overriden'],
@@ -44,7 +44,7 @@ class MockAScraper extends Scraper {
 
 class MockBScraper extends Scraper {
     onCreatePage(query, phantomUtils) {
-        return makeOnCreatePage(phantomUtils, [
+        return createOnCreatePage(phantomUtils, [
             ['Cbot', 'New description'],
             ['dbot', 'New name and description'],
             [' Fbot  ', 'Bot name will be trimmed'],
@@ -54,7 +54,7 @@ class MockBScraper extends Scraper {
     }
 }
 
-function makeScrapers(type, appObjects) {
+function createScrapers(type, appObjects) {
     let result = {}
 
     if (type === 'stub') {
@@ -91,7 +91,7 @@ function testScrapers(type, done, testClosure) {
         },
     }
 
-    const scraperFacade = new ScraperFacade(appObjectsMock, makeScrapers(type, appObjectsMock))
+    const scraperFacade = new ScraperFacade(appObjectsMock, createScrapers(type, appObjectsMock))
     scraperFacade
         .find('query')
         .then(testClosure)
