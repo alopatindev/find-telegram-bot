@@ -5,6 +5,7 @@ env:
   node: true
 extends: 'eslint:recommended'
 plugins:
+  - mocha
   - promise
 rules:
   indent:
@@ -223,6 +224,23 @@ rules:
   template-curly-spacing: warn
   yield-star-spacing: warn
   valid-jsdoc: warn
+  mocha/no-exclusive-tests: warn
+  mocha/no-skipped-tests: warn
+  mocha/no-pending-tests: warn
+  mocha/handle-done-callback: warn
+  mocha/no-synchronous-tests: warn
+  mocha/no-global-tests: warn
+  mocha/no-return-and-callback: off
+  mocha/valid-test-description: warn
+  mocha/valid-suite-description: warn
+  mocha/no-sibling-hooks: warn
+  mocha/no-mocha-arrows: off
+  mocha/no-hooks: warn
+  mocha/no-hooks-for-single-case: warn
+  mocha/no-top-level-hooks: warn
+  mocha/no-identical-title: warn
+  mocha/max-top-level-suites: warn
+  mocha/no-nested-tests: warn
   promise/always-return: error
   promise/no-return-wrap: error
   promise/param-names: error
