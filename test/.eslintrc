@@ -8,3 +8,12 @@ rules:
   max-statements:
     - warn
     - max: 30
+  promise/always-return: off
+  promise/no-return-wrap: off
+  promise/param-names: off
+  promise/catch-or-return: off
+  promise/no-native: off
+  promise/no-nesting: off
+  promise/no-promise-in-callback: off
+  promise/no-callback-in-promise: off
+  promise/avoid-new: off

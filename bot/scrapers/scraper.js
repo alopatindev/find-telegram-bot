@@ -44,7 +44,7 @@ class PhantomUtils {
                 const reason = failed ? ' due to failure' : ''
                 const message = ['exit instance', reason].join('')
                 this.logger.debug(message)
-                instance.exit()
+                return instance.exit()
             })
             .catch(this.logger.error)
     }
