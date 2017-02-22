@@ -44,12 +44,7 @@ function isValidNameAndDescription(value) {
     return name.endsWith(BOT_POSTFIX) && !nameHasWhitespace && !descriptionIsEmpty
 }
 
-function mergeAndFormatResults(results, appObjects) {
-    const {
-        config,
-        logger,
-    } = appObjects
-
+function mergeResults(results, config) {
     const updatedResults = flatten(results)
         .map(([name, description]) => [
             name.toLowerCase().trim(),
@@ -57,7 +52,15 @@ function mergeAndFormatResults(results, appObjects) {
         ])
         .filter(isValidNameAndDescription)
 
-    const mergedResults = new Map(updatedResults)
+    return new Map(updatedResults)
+}
+
+function mergeAndFormatResults(results, appObjects) {
+    const {
+        logger,
+    } = appObjects
+
+    const mergedResults = mergeResults(results, appObjects.config)
 
     const lines = Array
         .from(mergedResults)
