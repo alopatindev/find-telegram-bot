@@ -11,7 +11,7 @@ const Scraper = require('./scraper.js')
 const tgramScript = require('./browser-scripts/tgram.js')
 
 class TgramScraper extends Scraper {
-    onCreatePage(query, phantomUtils) {
+    _onCreatePage(query, phantomController) {
         const {
             logger,
             config,
@@ -22,8 +22,8 @@ class TgramScraper extends Scraper {
         const baseUrl = 'https://tgram.ru'
         const url = encodeURI(`${baseUrl}/bots`)
 
-        phantomUtils.setOnCallback(result => {
-            phantomUtils.exit()
+        phantomController.setOnCallback(result => {
+            phantomController.exit()
 
             // return the final result
             shared.onResolveResult(result)
@@ -34,7 +34,7 @@ class TgramScraper extends Scraper {
             tgramScript,
         ]
 
-        const resultPromise = phantomUtils
+        const resultPromise = phantomController
             .openAndRun(url, scripts)
             .then(() => new Promise((resolve, reject) => {
                 shared.onResolveResult = resolve
@@ -43,7 +43,7 @@ class TgramScraper extends Scraper {
                 setTimeout(() => shared.onRejectResult(new Error('Scraping Timeout')), config.scrapingTimeoutMs)
             }))
             .catch(e => {
-                phantomUtils.exit(e)
+                phantomController.exit(e)
                 return []
             })
 

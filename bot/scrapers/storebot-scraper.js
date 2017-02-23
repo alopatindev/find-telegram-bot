@@ -11,7 +11,7 @@ const Scraper = require('./scraper.js')
 const storebotScript = require('./browser-scripts/storebot.js')
 
 class StorebotScraper extends Scraper {
-    onCreatePage(query, phantomUtils) {
+    _onCreatePage(query, phantomController) {
         const baseUrl = 'https://storebot.me'
         const url = encodeURI(`${baseUrl}/search?text=${query}`)
 
@@ -20,14 +20,14 @@ class StorebotScraper extends Scraper {
             storebotScript.toString(),
         ]
 
-        const resultPromise = phantomUtils
+        const resultPromise = phantomController
             .openAndRun(url, scripts)
             .then(result => {
-                phantomUtils.exit()
+                phantomController.exit()
                 return result // return the final result
             })
             .catch(e => {
-                phantomUtils.exit(e)
+                phantomController.exit(e)
                 return []
             })
 

@@ -7,22 +7,66 @@
 
 'use strict'
 
-const Telegraf = require('telegraf')
+function formatResults(results) {
+    const lines = Array
+        .from(results)
+        .sort()
+        .map(([name, description]) => `@${name} — ${description}`)
 
-const ScraperFacade = require('./scrapers/scraper-facade.js')
+    return lines
+}
 
-function createBot(appObjects) {
-    const {
-        config,
-        logger,
-    } = appObjects
+class Bot {
+    constructor(telegraf, scraperFacade, appObjects) {
+        this._telegraf = telegraf
+        this._scraperFacade = scraperFacade
+        this._config = appObjects.config
+        this._logger = appObjects.logger
 
-    const scraperFacade = new ScraperFacade(appObjects)
-    const bot = new Telegraf(config.telegramBotToken)
+        telegraf.command('start', ctx => this._onStart(ctx))
+        telegraf.on('message', ctx => this._onMessage(ctx))
+    }
 
-    function onNextReply(ctx, lines, index) {
+    run() {
+        this._telegraf.startPolling()
+    }
+
+    _onStart(ctx) {
+        ctx
+            .reply(this._config.text.welcome)
+            .catch(this._logger.error)
+    }
+
+    _onMessage(ctx) {
+        const query = ctx
+            .message
+            .text
+            .trim()
+            .toLowerCase()
+
+        this._logger.info(`query="${query}" from "${ctx.from.username}" (${ctx.from.id})`)
+
+        if (query.length === 0) {
+            ctx
+                .reply(this._config.text.welcome)
+                .catch(this._logger.error)
+        } else {
+            this._scraperFacade
+                .find(query)
+                .then(results => formatResults(results))
+                .then(lines => ctx
+                    .reply(`${this._config.text.foundBots}${lines.length}`)
+                    .then(() => this._onNextReply(ctx, lines, 0))
+                    .catch(this._logger.error)
+                )
+                .then(() => this._logger.debug(`replying to ${ctx.from.id} with results`))
+                .catch(this._logger.error)
+        }
+    }
+
+    _onNextReply(ctx, lines, index) {
         if (index < lines.length) {
-            const nextIndex = index + config.message.maxLines
+            const nextIndex = index + this._config.message.maxLines
 
             const message = lines
                 .slice(index, nextIndex)
@@ -30,45 +74,12 @@ function createBot(appObjects) {
 
             ctx
                 .reply(message)
-                .then(() => onNextReply(ctx, lines, nextIndex))
-                .catch(logger.error)
+                .then(() => this._onNextReply(ctx, lines, nextIndex))
+                .catch(this._logger.error)
         } else {
-            logger.debug(`finished replying to ${ctx.from.id}`)
+            this._logger.debug(`finished replying to ${ctx.from.id}`)
         }
     }
-
-    bot.command('start', ctx => ctx
-        .reply(config.text.welcome)
-        .catch(logger.error)
-    )
-
-    bot.on('message', ctx => {
-        const query = ctx
-            .message
-            .text
-            .trim()
-            .toLowerCase()
-
-        logger.info(`query="${query}" from "${ctx.from.username}" (${ctx.from.id})`)
-
-        if (query.length === 0) {
-            ctx
-                .reply(config.text.welcome)
-                .catch(logger.error)
-        } else {
-            scraperFacade
-                .find(query)
-                .then(lines => ctx
-                    .reply(`${config.text.foundBots}${lines.length}`)
-                    .then(() => onNextReply(ctx, lines, 0))
-                    .catch(logger.error)
-                )
-                .then(() => logger.debug(`replying to ${ctx.from.id} with results`))
-                .catch(logger.error)
-        }
-    })
-
-    return bot
 }
 
-module.exports = createBot
+module.exports = Bot

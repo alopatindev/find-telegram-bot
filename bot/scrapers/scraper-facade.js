@@ -7,9 +7,6 @@
 
 'use strict'
 
-const StorebotScraper = require('./storebot-scraper.js')
-const TgramScraper = require('./tgram-scraper.js')
-
 const BOT_POSTFIX = 'bot'
 
 const DOTS_CHARACTER_CODE = 8230
@@ -19,21 +16,18 @@ function flatten(arrays) {
     return [].concat(...arrays)
 }
 
+function isValidResult(result) {
+    const [name, description] = result
+    const nameHasWhitespace = name.includes(' ') || name.includes('\t')
+    const descriptionIsEmpty = description.length === 0
+    return name.endsWith(BOT_POSTFIX) && !nameHasWhitespace && !descriptionIsEmpty
+}
+
 class ScraperFacade {
     constructor(appObjects, scrapers) {
         this._config = appObjects.config
         this._logger = appObjects.logger
-
-        if (scrapers === undefined) {
-            const defaultScrapers = {
-                storebot: new StorebotScraper(appObjects),
-                tgram: new TgramScraper(appObjects),
-            }
-
-            this._scrapers = defaultScrapers
-        } else {
-            this._scrapers = scrapers
-        }
+        this._scrapers = scrapers
     }
 
     /**
@@ -50,7 +44,7 @@ class ScraperFacade {
 
         return Promise
             .all(scraperPromises)
-            .then(results => this._mergeAndFormatResults(results))
+            .then(results => this._mergeAndFilterResults(results))
             .catch(this._logger.error)
     }
 
@@ -73,35 +67,15 @@ class ScraperFacade {
         return result
     }
 
-    _isValidResult(result) {
-        const [name, description] = result
-        const nameHasWhitespace = name.includes(' ') || name.includes('\t')
-        const descriptionIsEmpty = description.length === 0
-        return name.endsWith(BOT_POSTFIX) && !nameHasWhitespace && !descriptionIsEmpty
-    }
-
-    _mergeResults(results) {
+    _mergeAndFilterResults(results) {
         const updatedResults = flatten(results)
             .map(([name, description]) => [
                 name.toLowerCase().trim(),
                 this._filterDescription(description),
             ])
-            .filter(result => this._isValidResult(result))
+            .filter(result => isValidResult(result))
 
         return new Map(updatedResults)
-    }
-
-    _mergeAndFormatResults(results) {
-        const mergedResults = this._mergeResults(results)
-
-        const lines = Array
-            .from(mergedResults)
-            .sort()
-            .map(([name, description]) => `@${name} — ${description}`)
-
-        this._logger.debug(`lines.length = ${lines.length}`)
-
-        return lines
     }
 }
 

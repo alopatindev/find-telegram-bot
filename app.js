@@ -13,7 +13,15 @@ const appObjects = {
     config,
     logger,
 }
-const bot = require('./bot')(appObjects)
+
+const scrapers = require('./bot/scrapers')(appObjects)
+const ScraperFacade = require('./bot/scrapers/scraper-facade.js')
+const scraperFacade = new ScraperFacade(appObjects, scrapers)
+
+const Bot = require('./bot')
+const Telegraf = require('telegraf')
+const telegraf = new Telegraf(config.telegramBotToken)
+const bot = new Bot(telegraf, scraperFacade, appObjects)
 
 function onExit(signal) {
     logger.info(`exiting due to ${signal}`)
@@ -25,6 +33,5 @@ function onExit(signal) {
     process.on(signal, () => onExit(signal))
 })
 
-bot.startPolling()
-
+bot.run()
 logger.info('started')

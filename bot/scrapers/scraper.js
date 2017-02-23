@@ -12,7 +12,7 @@ const phantomjs = require('phantom')
 
 const USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1'
 
-class PhantomUtils {
+class PhantomController {
     constructor(page, instancePromise, logger) {
         this._page = page
         this._instancePromise = instancePromise
@@ -89,13 +89,14 @@ class Scraper {
                 page.setting('userAgent', USER_AGENT)
                 page.on('onConsoleMessage', logger.debug)
 
-                const phantomUtils = new PhantomUtils(page, instancePromise, logger)
-                return this.onCreatePage(query, phantomUtils)
+                const phantomController = new PhantomController(page, instancePromise, logger)
+                const createPagePromise = this._onCreatePage(query, phantomController)
+                return createPagePromise
             })
             .catch(logger.error)
     }
 
-    onCreatePage(_query, _phantomUtils) {
+    _onCreatePage(_query, _phantomController) {
         throw new TypeError('Not implemented')
     }
 }
