@@ -8,12 +8,13 @@
 'use strict'
 
 const assert = require('assert')
-const logger = require('mocha-logger')
+const {
+    createAppObjectsMock,
+    logger,
+} = require('./utils.js')
 
 const Scraper = require('../bot/scrapers/scraper.js')
 const ScraperFacade = require('../bot/scrapers/scraper-facade.js')
-
-const stubFunction = () => undefined
 
 function createOnCreatePage(phantomController, results) {
     return new Promise(resolve => {
@@ -53,7 +54,7 @@ class MockBScraper extends Scraper {
 }
 
 function createScrapers(type, appObjects) {
-    let result = {}
+    let result = undefined
 
     if (type === 'stub') {
         result = {
@@ -75,122 +76,107 @@ function createScrapers(type, appObjects) {
 }
 
 function testScrapers(type, done, testClosure) {
-    const appObjectsMock = {
-        config: {
-            message: {
-                descriptionMaxLength: 100,
-                maxLines: 30,
-            },
-        },
-
-        logger: {
-            debug: stubFunction,
-            info: stubFunction,
-        },
-    }
-
+    const appObjectsMock = createAppObjectsMock()
     const scraperFacade = new ScraperFacade(appObjectsMock, createScrapers(type, appObjectsMock))
     scraperFacade
         .find('query')
         .then(testClosure)
         .then(done)
-        .catch(error => logger.error(error.stack))
+        .catch(logger.error)
 }
 
 describe('ScraperFacade', () => {
-    describe('#find()', () => {
-        it('should merge empty results', done => testScrapers('stub', done, results => {
-            assert.strictEqual(results.size, 0)
-        }))
+    it('should merge empty results', done => testScrapers('stub', done, results => {
+        assert.strictEqual(results.size, 0)
+    }))
 
-        it('should override previous descriptions', done => testScrapers('mock', done, results => {
-            const hasOldDescriptions =
-                results.get('cbot') === 'Description will be overriden' ||
-                results.get('dbot') === 'Both name and description will be overriden'
+    it('should override previous descriptions', done => testScrapers('mock', done, results => {
+        const hasOldDescriptions =
+            results.get('cbot') === 'Description will be overriden' ||
+            results.get('dbot') === 'Both name and description will be overriden'
 
-            const hasNewDescriptions =
-                results.get('cbot') === 'New description' &&
-                results.get('dbot') === 'New name and description'
+        const hasNewDescriptions =
+            results.get('cbot') === 'New description' &&
+            results.get('dbot') === 'New name and description'
 
-            assert(!hasOldDescriptions)
-            assert(hasNewDescriptions)
-        }))
+        assert(!hasOldDescriptions)
+        assert(hasNewDescriptions)
+    }))
 
-        it('should have case-insensitive bot names', done => testScrapers('mock', done, results => {
-            const hasOldName = results.has('Dbot')
-            const hasNewName = results.has('dbot')
+    it('should have case-insensitive bot names', done => testScrapers('mock', done, results => {
+        const hasOldName = results.has('Dbot')
+        const hasNewName = results.has('dbot')
 
-            assert(!hasOldName)
-            assert(hasNewName)
-        }))
+        assert(!hasOldName)
+        assert(hasNewName)
+    }))
 
-        it('should contain only bot names with postfix "bot"', done => testScrapers('mock', done, results => {
-            const nameHasPostfixBot = Array.from(results.keys())
-                .filter(name => /^.*bot$/.test(name))
-                .length === results.size
+    it('should contain only bot names with postfix "bot"', done => testScrapers('mock', done, results => {
+        const nameHasPostfixBot = Array.from(results.keys())
+            .filter(name => /^.*bot$/.test(name))
+            .length === results.size
 
-            assert(nameHasPostfixBot)
-        }))
+        assert(nameHasPostfixBot)
+    }))
 
-        it('should trim description whitespace', done => testScrapers('mock', done, results => {
-            const hasWhitespace = Array.from(results.values())
-                .filter(description =>
-                    description.startsWith(' ') ||
-                    description.endsWith(' ') ||
-                    description.startsWith('\t') ||
-                    description.endsWith('\t'))
-                .length > 0
+    it('should trim description whitespace', done => testScrapers('mock', done, results => {
+        const hasWhitespace = Array.from(results.values())
+            .filter(description =>
+                description.startsWith(' ') ||
+                description.endsWith(' ') ||
+                description.startsWith('\t') ||
+                description.endsWith('\t'))
+            .length > 0
 
-            assert(!hasWhitespace)
-        }))
+        assert(!hasWhitespace)
+    }))
 
-        it('should remove URLs from description', done => testScrapers('mock', done, results => {
-            const hasUrls = Array.from(results.values())
-                .filter(description =>
-                    description.includes('https://') ||
-                    description.includes('http://') ||
-                    description.includes('ftp://'))
-                .length > 0
+    it('should remove URLs from description', done => testScrapers('mock', done, results => {
+        const hasUrls = Array.from(results.values())
+            .filter(description =>
+                description.includes('https://') ||
+                description.includes('http://') ||
+                description.includes('ftp://'))
+            .length > 0
 
-            assert(!hasUrls)
-        }))
+        assert(!hasUrls)
+    }))
 
-        it('should remove @ from description', done => testScrapers('mock', done, results => {
-            const hasAtChar = Array.from(results.values())
-                .filter(description => description
-                    .slice(1)
-                    .includes('@'))
-                .length > 0
+    it('should remove @ from description', done => testScrapers('mock', done, results => {
+        const hasAtChar = Array.from(results.values())
+            .filter(description => description
+                .slice(1)
+                .includes('@'))
+            .length > 0
 
-            assert(!hasAtChar)
-        }))
+        assert(!hasAtChar)
+    }))
 
-        it('should remove new lines from description', done => testScrapers('mock', done, results => {
-            const hasNewLines = Array.from(results.values())
-                .filter(description => description.includes('\n'))
-                .length > 0
+    it('should remove new lines from description', done => testScrapers('mock', done, results => {
+        const hasNewLines = Array.from(results.values())
+            .filter(description => description.includes('\n'))
+            .length > 0
 
-            assert(!hasNewLines)
-        }))
+        assert(!hasNewLines)
+    }))
 
-        it('should contain non-empty descriptions', done => testScrapers('mock', done, results => {
-            const hasEmptyDescriptions = Array.from(results.values())
-                .filter(description => description.length === 0)
-                .length > 0
+    it('should contain non-empty descriptions', done => testScrapers('mock', done, results => {
+        const hasEmptyDescriptions = Array.from(results.values())
+            .filter(description => description.length === 0)
+            .length > 0
 
-            assert(!hasEmptyDescriptions)
-        }))
+        assert(!hasEmptyDescriptions)
+    }))
 
-        it('should trim bot names', done => testScrapers('mock', done, results => {
-            const hasNamesWithWhitespace = Array.from(results.keys())
-                .filter(name =>
-                    name.startsWith(' ') ||
-                    name.startsWith('\t') ||
-                    name.endsWith(' ') ||
-                    name.endsWith('\t'))
-                .length === results.length
+    it('should trim bot names', done => testScrapers('mock', done, results => {
+        const hasNamesWithWhitespace = Array.from(results.keys())
+            .filter(name =>
+                name.startsWith(' ') ||
+                name.startsWith('\t') ||
+                name.endsWith(' ') ||
+                name.endsWith('\t'))
+            .length === results.length
 
-            assert(!hasNamesWithWhitespace)
-        }))
-    })
+        assert(!hasNamesWithWhitespace)
+    }))
 })

@@ -7,7 +7,7 @@
 
 'use strict'
 
-function formatResults(results) {
+function sortAndFormatResults(results) {
     const lines = Array
         .from(results)
         .sort()
@@ -53,7 +53,7 @@ class Bot {
         } else {
             this._scraperFacade
                 .find(query)
-                .then(results => formatResults(results))
+                .then(results => sortAndFormatResults(results))
                 .then(lines => ctx
                     .reply(`${this._config.text.foundBots}${lines.length}`)
                     .then(() => this._onNextReply(ctx, lines, 0))

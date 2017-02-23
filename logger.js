@@ -27,6 +27,11 @@ function logger(config) {
     winston.level = level
     logger.level = level
 
+    const logError = logger.error
+    logger.error = e => {
+        logError.bind(logger)(e.hasOwnProperty('stack') ? e.stack : e)
+    }
+
     return logger
 }
 
