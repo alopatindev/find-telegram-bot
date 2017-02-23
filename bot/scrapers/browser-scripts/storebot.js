@@ -36,15 +36,15 @@ module.exports = function() {
             })
     }
 
-    var result = []
+    var results = []
 
     try {
         console.debug('storebotScript')
-        result = script()
-        console.debug('storebotScript end')
+        results = script()
+        console.debug('storebotScript end results.length=' + results.length)
     } catch (e) {
         console.error(e)
     }
 
-    return result
+    return results
 }

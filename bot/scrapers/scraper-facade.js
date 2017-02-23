@@ -19,62 +19,10 @@ function flatten(arrays) {
     return [].concat(...arrays)
 }
 
-function filterDescription(text, config) {
-    let result = text
-        .replace(/[@\n]/g, '')
-        .replace(/(?:https?|ftp):\/\/[\n\S]+/g, '')
-        .trim()
-
-    if (result.length > config.message.descriptionMaxLength) {
-        result = result.slice(0, config.message.descriptionMaxLength)
-        const hasDots = result.endsWith('...') || result.endsWith(DOTS_CHARACTER)
-
-        if (!hasDots) {
-            result = `${result}${DOTS_CHARACTER}`
-        }
-    }
-
-    return result
-}
-
-function isValidNameAndDescription(value) {
-    const [name, description] = value
-    const nameHasWhitespace = name.includes(' ') || name.includes('\t')
-    const descriptionIsEmpty = description.length === 0
-    return name.endsWith(BOT_POSTFIX) && !nameHasWhitespace && !descriptionIsEmpty
-}
-
-function mergeResults(results, config) {
-    const updatedResults = flatten(results)
-        .map(([name, description]) => [
-            name.toLowerCase().trim(),
-            filterDescription(description, config),
-        ])
-        .filter(isValidNameAndDescription)
-
-    return new Map(updatedResults)
-}
-
-function mergeAndFormatResults(results, appObjects) {
-    const {
-        logger,
-    } = appObjects
-
-    const mergedResults = mergeResults(results, appObjects.config)
-
-    const lines = Array
-        .from(mergedResults)
-        .sort()
-        .map(([name, description]) => `@${name} — ${description}`)
-
-    logger.debug(`lines.length = ${lines.length}`)
-
-    return lines
-}
-
 class ScraperFacade {
     constructor(appObjects, scrapers) {
-        this.appObjects = appObjects
+        this._config = appObjects.config
+        this._logger = appObjects.logger
 
         if (scrapers === undefined) {
             const defaultScrapers = {
@@ -82,9 +30,9 @@ class ScraperFacade {
                 tgram: new TgramScraper(appObjects),
             }
 
-            this.scrapers = defaultScrapers
+            this._scrapers = defaultScrapers
         } else {
-            this.scrapers = scrapers
+            this._scrapers = scrapers
         }
     }
 
@@ -96,15 +44,64 @@ class ScraperFacade {
     find(query) {
         // TODO: if cached then get
         const scraperPromises = this
-            .appObjects
-            .config
+            ._config
             .scrapers
-            .map(scraper => this.scrapers[scraper].find(query))
+            .map(scraper => this._scrapers[scraper].find(query))
 
         return Promise
             .all(scraperPromises)
-            .then(results => mergeAndFormatResults(results, this.appObjects))
-            .catch(this.appObjects.logger.error)
+            .then(results => this._mergeAndFormatResults(results))
+            .catch(this._logger.error)
+    }
+
+    _filterDescription(text) {
+        let result = text
+            .replace(/[@\n]/g, '')
+            .replace(/(?:https?|ftp):\/\/[\n\S]+/g, '')
+            .trim()
+
+        const maxLength = this._config.message.descriptionMaxLength
+        if (result.length > maxLength) {
+            result = result.slice(0, maxLength)
+            const hasDots = result.endsWith('...') || result.endsWith(DOTS_CHARACTER)
+
+            if (!hasDots) {
+                result = `${result}${DOTS_CHARACTER}`
+            }
+        }
+
+        return result
+    }
+
+    _isValidResult(result) {
+        const [name, description] = result
+        const nameHasWhitespace = name.includes(' ') || name.includes('\t')
+        const descriptionIsEmpty = description.length === 0
+        return name.endsWith(BOT_POSTFIX) && !nameHasWhitespace && !descriptionIsEmpty
+    }
+
+    _mergeResults(results) {
+        const updatedResults = flatten(results)
+            .map(([name, description]) => [
+                name.toLowerCase().trim(),
+                this._filterDescription(description),
+            ])
+            .filter(result => this._isValidResult(result))
+
+        return new Map(updatedResults)
+    }
+
+    _mergeAndFormatResults(results) {
+        const mergedResults = this._mergeResults(results)
+
+        const lines = Array
+            .from(mergedResults)
+            .sort()
+            .map(([name, description]) => `@${name} — ${description}`)
+
+        this._logger.debug(`lines.length = ${lines.length}`)
+
+        return lines
     }
 }
 

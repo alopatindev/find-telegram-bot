@@ -262,7 +262,7 @@ rules:
   mocha/no-identical-title: warn
   mocha/max-top-level-suites: warn
   mocha/no-nested-tests: warn
-  private-props/no-unused-or-undeclared: error
+  private-props/no-unused-or-undeclared: off # due to https://github.com/globetro/eslint-plugin-private-props/issues/6
   private-props/no-use-outside: error
   promise/always-return: error
   promise/no-return-wrap: error

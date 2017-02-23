@@ -32,6 +32,8 @@ function createBot(appObjects) {
                 .reply(message)
                 .then(() => onNextReply(ctx, lines, nextIndex))
                 .catch(logger.error)
+        } else {
+            logger.debug(`finished replying to ${ctx.from.id}`)
         }
     }
 
@@ -61,6 +63,7 @@ function createBot(appObjects) {
                     .then(() => onNextReply(ctx, lines, 0))
                     .catch(logger.error)
                 )
+                .then(() => logger.debug(`replying to ${ctx.from.id} with results`))
                 .catch(logger.error)
         }
     })

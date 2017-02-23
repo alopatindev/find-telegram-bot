@@ -20,10 +20,10 @@ function onExit(signal) {
     process.exit(0)
 }
 
-for (const signal of ['SIGINT', 'SIGTERM']) {
+['SIGINT', 'SIGTERM'].forEach(signal => {
     logger.debug(`set ${signal} handler`)
     process.on(signal, () => onExit(signal))
-}
+})
 
 bot.startPolling()
 

@@ -14,18 +14,18 @@ const USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) Apple
 
 class PhantomUtils {
     constructor(page, instancePromise, logger) {
-        this.page = page
-        this.instancePromise = instancePromise
-        this.logger = logger
+        this._page = page
+        this._instancePromise = instancePromise
+        this._logger = logger
     }
 
     openAndRun(url, scripts) {
-        return this.page
+        return this._page
             .open(url)
             .then(status => {
                 assert.strictEqual(status, 'success', `Failed to load '${url}' status=${status}`)
                 assert(scripts.length > 0, 'You need to provide a script')
-                const results = scripts.map(script => this.page.evaluateJavaScript(script))
+                const results = scripts.map(script => this._page.evaluateJavaScript(script))
                 const lastResult = results[results.length - 1]
                 return lastResult
             })
@@ -35,26 +35,26 @@ class PhantomUtils {
         const failed = error !== undefined
 
         if (failed) {
-            this.logger.error(error)
+            this._logger.error(error)
         }
 
-        this.instancePromise
+        this._instancePromise
             .then(instance => {
                 // instance is phantom in phantom context
                 const reason = failed ? ' due to failure' : ''
                 const message = ['exit instance', reason].join('')
-                this.logger.debug(message)
+                this._logger.debug(message)
                 return instance.exit()
             })
-            .catch(this.logger.error)
+            .catch(this._logger.error)
     }
 
     setOnCallback(callback) {
-        this.page.on('onCallback', result => {
+        this._page.on('onCallback', result => {
             try {
                 callback(result)
             } catch (e) {
-                this.logger.error(e)
+                this._logger.error(e)
             }
         })
     }
@@ -62,13 +62,13 @@ class PhantomUtils {
 
 class Scraper {
     constructor(appObjects) {
-        this.appObjects = appObjects
+        this._appObjects = appObjects
     }
 
     find(query) {
         const {
             logger,
-        } = this.appObjects
+        } = this._appObjects
 
         const instancePromise = phantomjs
             .create([

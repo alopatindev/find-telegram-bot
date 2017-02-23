@@ -27,7 +27,7 @@ module.exports = function() {
                     .find('small')
                     .find('a')
 
-                const result = urls
+                const results = urls
                     .toArray()
                     .filter(function(url) {
                         return url.href.indexOf(botUrlPrefix) === 0
@@ -42,7 +42,8 @@ module.exports = function() {
                         return [name, description]
                     })
 
-                window.callPhantom(result) // runs onCallback
+                console.debug('tgramScript results.length=' + results.length)
+                window.callPhantom(results) // runs onCallback
             })
     }
 

@@ -15,7 +15,7 @@ class TgramScraper extends Scraper {
         const {
             logger,
             config,
-        } = this.appObjects
+        } = this._appObjects
 
         const shared = {}
 

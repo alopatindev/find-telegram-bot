@@ -8,6 +8,7 @@
 'use strict'
 
 const assert = require('assert')
+const logger = require('mocha-logger')
 
 const Scraper = require('../bot/scrapers/scraper.js')
 const ScraperFacade = require('../bot/scrapers/scraper-facade.js')
@@ -16,10 +17,7 @@ const stubFunction = () => undefined
 
 function createOnCreatePage(phantomUtils, results) {
     return new Promise(resolve => {
-        phantomUtils
-            .instancePromise
-            .then(instance => instance.exit())
-
+        phantomUtils.exit()
         resolve(results)
     })
 }
@@ -96,6 +94,7 @@ function testScrapers(type, done, testClosure) {
         .find('query')
         .then(testClosure)
         .then(done)
+        .catch(error => logger.error(error.stack))
 }
 
 describe('ScraperFacade', () => {
