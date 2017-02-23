@@ -5,6 +5,7 @@ env:
   node: true
 extends: 'eslint:recommended'
 plugins:
+  - better
   - mocha
   - promise
 rules:
@@ -224,6 +225,25 @@ rules:
   template-curly-spacing: warn
   yield-star-spacing: warn
   valid-jsdoc: warn
+  better/no-classes: off
+  better/no-deletes: warn
+  better/no-exceptions: off
+  better/no-exports: off
+  better/no-fors: warn
+  better/no-function-expressions: off
+  better/no-ifs: off
+  better/no-imports: off
+  better/no-instanceofs: error
+  better/no-new: off
+  better/no-nulls: error
+  better/no-reassigns: off
+  better/no-switches: warn
+  better/no-this: off
+  better/no-typeofs: warn
+  better/no-undefined: off
+  better/no-variable-declaration: off
+  better/no-whiles: warn
+  better/explicit-return: off
   mocha/no-exclusive-tests: warn
   mocha/no-skipped-tests: warn
   mocha/no-pending-tests: warn
