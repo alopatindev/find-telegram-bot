@@ -54,14 +54,17 @@ class Bot {
             this._scraperFacade
                 .find(query)
                 .then(results => sortAndFormatResults(results))
-                .then(lines => ctx
-                    .reply(`${this._config.text.foundBots}${lines.length}`)
-                    .then(() => this._onNextReply(ctx, lines, 0))
-                    .catch(this._logger.error)
-                )
+                .then(lines => this._onResultsReady(ctx, lines))
                 .then(() => this._logger.debug(`replying to ${ctx.from.id} with results`))
                 .catch(this._logger.error)
         }
+    }
+
+    _onResultsReady(ctx, lines) {
+        ctx
+            .reply(`${this._config.text.foundBots}${lines.length}`)
+            .then(() => this._onNextReply(ctx, lines, 0))
+            .catch(this._logger.error)
     }
 
     _onNextReply(ctx, lines, index) {

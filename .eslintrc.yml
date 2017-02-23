@@ -41,6 +41,7 @@ rules:
   array-callback-return: warn
   class-methods-use-this:
     - warn
+    - exceptMethods: ['_onCreatePage']
   complexity:
     - warn
     - max: 10
@@ -270,6 +271,6 @@ rules:
   promise/catch-or-return: error
   promise/no-native: off
   promise/no-nesting: warn
-  promise/no-promise-in-callback: warn
+  promise/no-promise-in-callback: off
   promise/no-callback-in-promise: warn
-  promise/avoid-new: warn
+  promise/avoid-new: off

@@ -9,6 +9,25 @@
 
 const winston = require('winston')
 
+function setLevel(logger, config) {
+    let level = 'info'
+
+    if (config.live === false) {
+        level = 'debug'
+        logger.add(winston.transports.Console)
+    }
+
+    winston.level = level
+    logger.level = level
+}
+
+function replaceErrorMethod(logger) {
+    const logError = logger.error
+    logger.error = e => {
+        logError.bind(logger)(e.hasOwnProperty('stack') ? e.stack : e)
+    }
+}
+
 function logger(config) {
     const logger = new winston.Logger()
 
@@ -18,19 +37,9 @@ function logger(config) {
         maxsize: config.log.maxSize,
     })
 
-    let level = 'info'
-    if (config.live === false) {
-        level = 'debug'
-        logger.add(winston.transports.Console)
-    }
+    setLevel(logger, config)
 
-    winston.level = level
-    logger.level = level
-
-    const logError = logger.error
-    logger.error = e => {
-        logError.bind(logger)(e.hasOwnProperty('stack') ? e.stack : e)
-    }
+    replaceErrorMethod(logger)
 
     return logger
 }

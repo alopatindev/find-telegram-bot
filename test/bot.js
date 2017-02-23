@@ -124,7 +124,7 @@ function createScraperFacadeMock(type) {
     }
 }
 
-function testBotReply(scraperType, message, expectMessages, done, testClosure) {
+function testBotReply(scraperType, message, expectMessages, done, testClosure) { // FIXME: use Builder pattern?
     const appObjectsMock = createAppObjectsMock()
 
     const telegrafMock = new TelegrafMock(done, appObjectsMock)
