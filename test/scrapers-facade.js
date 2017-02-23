@@ -53,7 +53,7 @@ class MockBScraper extends Scraper {
     }
 }
 
-function createScrapers(type, appObjects) {
+function createScrapersTestDouble(type, appObjects) {
     let result = undefined
 
     if (type === 'stub') {
@@ -77,7 +77,9 @@ function createScrapers(type, appObjects) {
 
 function testScrapers(type, done, testClosure) {
     const appObjectsMock = createAppObjectsMock()
-    const scraperFacade = new ScraperFacade(appObjectsMock, createScrapers(type, appObjectsMock))
+    const scrapersTestDouble = createScrapersTestDouble(type, appObjectsMock)
+    const scraperFacade = new ScraperFacade(appObjectsMock, scrapersTestDouble)
+
     scraperFacade
         .find('query')
         .then(testClosure)
@@ -113,7 +115,7 @@ describe('ScraperFacade', () => {
 
     it('should contain only bot names with postfix "bot"', done => testScrapers('mock', done, results => {
         const nameHasPostfixBot = Array.from(results.keys())
-            .filter(name => /^.*bot$/.test(name))
+            .filter(name => name.endsWith('bot'))
             .length === results.size
 
         assert(nameHasPostfixBot)

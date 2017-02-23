@@ -103,12 +103,12 @@ class TelegrafMock {
     }
 }
 
-function createScraperFacadeMock(type) {
+function createScraperFacadeMock(resultsType) {
     let results = undefined
 
-    if (type === 'stub') {
+    if (resultsType === 'stub') {
         results = new Map()
-    } else if (type === 'mock') {
+    } else if (resultsType === 'mock') {
         results = new Map([
             ['bbot', 'second bot'],
             ['abot', 'first bot'],
@@ -124,14 +124,14 @@ function createScraperFacadeMock(type) {
     }
 }
 
-function testBotReply(scraperType, message, expectMessages, done, testClosure) { // FIXME: use Builder pattern?
+function testBotReply(resultsType, message, expectMessages, done, testClosure) { // FIXME: use Builder pattern?
     const appObjectsMock = createAppObjectsMock()
 
     const telegrafMock = new TelegrafMock(done, appObjectsMock)
     telegrafMock.expectMessages = expectMessages
     telegrafMock.testMessageReplyClosure = testClosure
 
-    const scraperFacadeMock = createScraperFacadeMock(scraperType)
+    const scraperFacadeMock = createScraperFacadeMock(resultsType)
 
     const bot = new Bot(telegrafMock, scraperFacadeMock, appObjectsMock)
     bot.run()
