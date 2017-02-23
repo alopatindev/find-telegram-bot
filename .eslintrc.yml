@@ -7,6 +7,7 @@ extends: 'eslint:recommended'
 plugins:
   - better
   - mocha
+  - private-props
   - promise
 rules:
   indent:
@@ -173,7 +174,7 @@ rules:
   no-plusplus:
     - warn
     - allowForLoopAfterthoughts: true
-  no-underscore-dangle: warn
+  no-underscore-dangle: off
   no-unneeded-ternary: warn
   no-whitespace-before-property: warn
   object-curly-spacing: warn
@@ -261,6 +262,8 @@ rules:
   mocha/no-identical-title: warn
   mocha/max-top-level-suites: warn
   mocha/no-nested-tests: warn
+  private-props/no-unused-or-undeclared: error
+  private-props/no-use-outside: error
   promise/always-return: error
   promise/no-return-wrap: error
   promise/param-names: error
