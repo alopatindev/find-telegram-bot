@@ -1,6 +1,6 @@
 {
   "name": "find-telegram-bot",
-  "description": "Find Telegram Bots",
+  "description": "Search Telegram Bots with another Telegram Bot",
   "repository": "git@github.com:alopatindev/find-telegram-bot.git",
   "version": "0.0.0",
   "license": "MIT",

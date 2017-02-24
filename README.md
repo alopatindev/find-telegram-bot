@@ -1,4 +1,4 @@
-find-telegram-bot
+Find Telegram Bot
 =================
 
 [@FindTelegramBot](https://t.me/FindTelegramBot) — search Telegram Bots with another Telegram Bot
@@ -12,12 +12,14 @@ find-telegram-bot
 [![Known Vulnerabilities](https://snyk.io/test/github/alopatindev/find-telegram-bot/badge.svg)](https://snyk.io/test/github/alopatindev/find-telegram-bot)
 [All Badges](BADGES.md)
 
-Uses
-----
-- NodeJS
-- PhantomJS
-- Telegraf
+- runs as a server written in **JavaScript** / **Node.js**
+- scrapes data with **PhantomJS**
+- interacts with Telegram using **Telegraf**
+
+![Screenshot](https://raw.githubusercontent.com/alopatindev/assets/master/find-telegram-bot.png)
 
 License
 -------
-Licensed under the terms of MIT (read [LICENSE.txt](LICENSE.txt) for details)
+This software is licensed under the terms of MIT (read [LICENSE.txt](LICENSE.txt) for details)
+
+Icon made by [Freepik](http://www.freepik.com) from [Flaticon](http://www.flaticon.com) is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/)
