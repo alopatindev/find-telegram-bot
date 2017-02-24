@@ -11,6 +11,7 @@ const assert = require('assert')
 const { createAppObjectsMock, logger } = require('./utils.js')
 
 const Bot = require('../bot')
+const chars = require('../bot/chars.json')
 
 class TelegrafMock {
     constructor(done, appObjects) {
@@ -146,7 +147,7 @@ describe('Bot', () => {
     it('should sort, format and split output', done => testBotReply('mock', 'query', 3, done, (messages, config) => {
         const botsNumber = 4
         assert.strictEqual(messages[0], `${config.text.foundBots}${botsNumber}`)
-        assert.strictEqual(messages[1], '@abot — first bot\n@bbot — second bot\n@cbot — third bot')
-        assert.strictEqual(messages[2], '@zbot — last bot')
+        assert.strictEqual(messages[1], `@abot ${chars.em_dash} first bot\n@bbot ${chars.em_dash} second bot\n@cbot ${chars.em_dash} third bot`)
+        assert.strictEqual(messages[2], `@zbot ${chars.em_dash} last bot`)
     }))
 })

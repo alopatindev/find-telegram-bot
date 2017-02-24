@@ -7,11 +7,13 @@
 
 'use strict'
 
+const chars = require('./chars.json')
+
 function sortAndFormatResults(results) {
     const lines = Array
         .from(results)
         .sort()
-        .map(([name, description]) => `@${name} — ${description}`)
+        .map(([name, description]) => `@${name} ${chars.em_dash} ${description}`)
 
     return lines
 }

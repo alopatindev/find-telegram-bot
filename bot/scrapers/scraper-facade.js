@@ -8,9 +8,7 @@
 'use strict'
 
 const BOT_POSTFIX = 'bot'
-
-const DOTS_CHARACTER_CODE = 8230
-const DOTS_CHARACTER = String.fromCharCode(DOTS_CHARACTER_CODE)
+const chars = require('../chars.json')
 
 function flatten(arrays) {
     return [].concat(...arrays)
@@ -57,10 +55,10 @@ class ScraperFacade {
         const maxLength = this._config.message.descriptionMaxLength
         if (result.length > maxLength) {
             result = result.slice(0, maxLength)
-            const hasDots = result.endsWith('...') || result.endsWith(DOTS_CHARACTER)
+            const hasDots = result.endsWith('...') || result.endsWith(chars.dots)
 
             if (!hasDots) {
-                result = `${result}${DOTS_CHARACTER}`
+                result = `${result}${chars.dots}`
             }
         }
 
