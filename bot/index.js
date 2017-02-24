@@ -10,12 +10,10 @@
 const chars = require('./chars.json')
 
 function sortAndFormatResults(results) {
-    const lines = Array
+    return Array
         .from(results)
         .sort()
         .map(([name, description]) => `@${name} ${chars.em_dash} ${description}`)
-
-    return lines
 }
 
 class Bot {
@@ -55,7 +53,7 @@ class Bot {
         } else {
             this._scraperFacade
                 .find(query)
-                .then(results => sortAndFormatResults(results))
+                .then(sortAndFormatResults)
                 .then(lines => this._onResultsReady(ctx, lines))
                 .then(() => this._logger.debug(`replying to ${ctx.from.id} with results`))
                 .catch(this._logger.error)

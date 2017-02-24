@@ -24,7 +24,8 @@ function setLevel(logger, config) {
 function replaceErrorMethod(logger) {
     const logError = logger.error
     logger.error = e => {
-        logError.bind(logger)(e.hasOwnProperty('stack') ? e.stack : e)
+        const text = e.hasOwnProperty('stack') ? e.stack : e
+        logError.bind(logger)(text)
     }
 }
 

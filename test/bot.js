@@ -135,7 +135,7 @@ describe('Bot', () => {
         assert.strictEqual(messages[0], config.text.welcome)
     }))
 
-    it('should handle empty string like /start command', done => testBotReply('stub', '', 1, done, (messages, config) => {
+    it('should handle empty string as /start command', done => testBotReply('stub', '', 1, done, (messages, config) => {
         assert.strictEqual(messages[0], config.text.welcome)
     }))
 

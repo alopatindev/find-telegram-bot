@@ -8,6 +8,7 @@ rules:
   max-statements:
     - warn
     - max: 30
+  private-props/no-use-outside: off
   promise/always-return: off
   promise/no-return-wrap: off
   promise/param-names: off

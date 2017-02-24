@@ -88,7 +88,7 @@ function testScrapers(type, done, testClosure) {
         .catch(logger.error)
 }
 
-describe('ScraperFacade', () => {
+describe('ScraperFacade.find', () => {
     it('should merge empty results', done => testScrapers('stub', done, results => {
         assert.strictEqual(results.size, 0)
     }))

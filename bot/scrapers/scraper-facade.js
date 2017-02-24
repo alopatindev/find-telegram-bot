@@ -21,6 +21,24 @@ function isValidResult(result) {
     return name.endsWith(BOT_POSTFIX) && !nameHasWhitespace && !descriptionIsEmpty
 }
 
+function maybeAddDotsPostfix(description, truncated) {
+    let result = description
+    let needDotsPostfix = truncated
+
+    const hasDotsPostfix = new RegExp(`[ \t.${chars.dots}]{1,}$`)
+    const resultWithoutDots = result.replace(hasDotsPostfix, '')
+    if (resultWithoutDots.length < result.length) {
+        result = resultWithoutDots
+        needDotsPostfix = true
+    }
+
+    if (needDotsPostfix) {
+        result = `${result}${chars.dots}`
+    }
+
+    return result
+}
+
 class ScraperFacade {
     constructor(appObjects, scrapers) {
         this._config = appObjects.config
@@ -46,34 +64,6 @@ class ScraperFacade {
             .catch(this._logger.error)
     }
 
-    _filterDescription(text) {
-        let result = text
-            .replace(/[@\n]/g, '')
-            .replace(/(?:https?|ftp):\/\/[\n\S]+/g, '')
-            .trim()
-
-        let needDotsPostfix = false
-
-        const maxLength = this._config.message.descriptionMaxLength
-        if (result.length > maxLength) {
-            result = result.slice(0, maxLength)
-            needDotsPostfix = true
-        }
-
-        const hasDotsPostfix = new RegExp(`[ \t\.${chars.dots}]{1,}\$`)
-        const resultWithoutDots = result.replace(hasDotsPostfix, '')
-        if (resultWithoutDots.length < result.length) {
-            result = resultWithoutDots
-            needDotsPostfix = true
-        }
-
-        if (needDotsPostfix) {
-            result = `${result}${chars.dots}`
-        }
-
-        return result
-    }
-
     _mergeAndFilterResults(results) {
         const updatedResults = flatten(results)
             .map(([name, description]) => [
@@ -83,6 +73,22 @@ class ScraperFacade {
             .filter(result => isValidResult(result))
 
         return new Map(updatedResults)
+    }
+
+    _filterDescription(description) {
+        let result = description
+            .replace(/[@\n]/g, '')
+            .replace(/(?:https?|ftp):\/\/[\n\S]+/g, '')
+            .trim()
+
+        let truncated = false
+        const maxLength = this._config.message.descriptionMaxLength
+        if (result.length > maxLength) {
+            result = result.slice(0, maxLength)
+            truncated = true
+        }
+
+        return maybeAddDotsPostfix(result, truncated)
     }
 }
 
