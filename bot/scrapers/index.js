@@ -11,10 +11,9 @@ const TgramScraper = require('./tgram-scraper.js')
 const StorebotScraper = require('./storebot-scraper.js')
 
 function createScrapers(appObjects) {
-    return {
-        storebot: new StorebotScraper(appObjects),
-        tgram: new TgramScraper(appObjects),
-    }
+    const storebot = new StorebotScraper(appObjects)
+    const tgram = new TgramScraper(appObjects)
+    return { storebot, tgram }
 }
 
 module.exports = createScrapers

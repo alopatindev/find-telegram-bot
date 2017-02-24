@@ -66,9 +66,7 @@ class Scraper {
     }
 
     find(query) {
-        const {
-            logger,
-        } = this._appObjects
+        const { logger } = this._appObjects
 
         const instancePromise = phantomjs
             .create([

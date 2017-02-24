@@ -9,10 +9,7 @@
 
 const config = require('./config.js')
 const logger = require('./logger.js')(config)
-const appObjects = {
-    config,
-    logger,
-}
+const appObjects = { config, logger }
 
 const scrapers = require('./bot/scrapers')(appObjects)
 const ScraperFacade = require('./bot/scrapers/scraper-facade.js')

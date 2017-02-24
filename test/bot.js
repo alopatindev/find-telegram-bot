@@ -8,10 +8,7 @@
 'use strict'
 
 const assert = require('assert')
-const {
-    createAppObjectsMock,
-    logger,
-} = require('./utils.js')
+const { createAppObjectsMock, logger } = require('./utils.js')
 
 const Bot = require('../bot')
 
@@ -69,13 +66,8 @@ class TelegrafMock {
         const self = this
 
         return {
-            from: {
-                id: 1,
-                username: 'user',
-            },
-            message: {
-                text: query,
-            },
+            from: { id: 1, username: 'user' },
+            message: { text: query },
             reply: text => {
                 assert(self.polling)
 
@@ -119,9 +111,7 @@ function createScraperFacadeMock(resultsType) {
         throw new Error('No such ScraperFacade type')
     }
 
-    return {
-        find: _query => new Promise(resolve => resolve(results)),
-    }
+    return { find: _query => new Promise(resolve => resolve(results)) }
 }
 
 function testBotReply(resultsType, message, expectMessages, done, testClosure) { // FIXME: use Builder pattern?

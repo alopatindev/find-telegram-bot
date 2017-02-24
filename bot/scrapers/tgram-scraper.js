@@ -12,10 +12,7 @@ const tgramScript = require('./browser-scripts/tgram.js')
 
 class TgramScraper extends Scraper {
     _onCreatePage(query, phantomController) {
-        const {
-            logger,
-            config,
-        } = this._appObjects
+        const { logger, config } = this._appObjects
 
         const shared = {}
 

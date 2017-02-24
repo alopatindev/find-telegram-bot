@@ -8,10 +8,7 @@
 'use strict'
 
 const assert = require('assert')
-const {
-    createAppObjectsMock,
-    logger,
-} = require('./utils.js')
+const { createAppObjectsMock, logger } = require('./utils.js')
 
 const Scraper = require('../bot/scrapers/scraper.js')
 const ScraperFacade = require('../bot/scrapers/scraper-facade.js')

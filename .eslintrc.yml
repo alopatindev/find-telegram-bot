@@ -125,7 +125,10 @@ rules:
   no-sync: warn
   array-bracket-spacing: warn
   block-spacing: warn
-  brace-style: warn
+  brace-style:
+    - warn
+    - 1tbs
+    - allowSingleLine: true
   camelcase: warn
   comma-dangle:
     - warn
@@ -178,8 +181,12 @@ rules:
   no-underscore-dangle: off
   no-unneeded-ternary: warn
   no-whitespace-before-property: warn
-  object-curly-spacing: warn
-  object-property-newline: warn
+  object-curly-spacing:
+    - warn
+    - always
+  object-property-newline:
+    - warn
+    - allowMultiplePropertiesPerLine: true
   one-var-declaration-per-line:
     - error
     - always
