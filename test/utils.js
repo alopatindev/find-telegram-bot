@@ -20,7 +20,7 @@ function createAppObjectsMock() {
     return {
         config: {
             message: {
-                descriptionMaxLength: 100,
+                descriptionMaxLength: 70,
                 maxLines: 3,
             },
 

@@ -8,8 +8,10 @@
 'use strict'
 
 const assert = require('assert')
+
 const { createAppObjectsMock, logger } = require('./utils.js')
 
+const chars = require('../bot/chars.json')
 const Scraper = require('../bot/scrapers/scraper.js')
 const ScraperFacade = require('../bot/scrapers/scraper-facade.js')
 
@@ -46,6 +48,8 @@ class MockBScraper extends Scraper {
             [' Fbot  ', 'Bot name will be trimmed'],
             ['G bot', 'Will be removed because of invalid name'],
             ['', 'Will be removed because of invalid name'],
+            ['longbot', 'Very-very-very-very-very-very-very-very-very-very-very-very long description'],
+            ['shortbot', `New name and description with dots..\t ${chars.dots}\t`],
         ])
     }
 }
@@ -128,6 +132,14 @@ describe('ScraperFacade', () => {
             .length > 0
 
         assert(!hasWhitespace)
+    }))
+
+    it('should truncate long descriptions and put a single dots character', done => testScrapers('mock', done, results => {
+        assert.strictEqual(results.get('longbot'), `Very-very-very-very-very-very-very-very-very-very-very-very long descr${chars.dots}`)
+    }))
+
+    it('should replace all dots at the end of description with a single dots character', done => testScrapers('mock', done, results => {
+        assert.strictEqual(results.get('shortbot'), `New name and description with dots${chars.dots}`)
     }))
 
     it('should remove URLs from description', done => testScrapers('mock', done, results => {

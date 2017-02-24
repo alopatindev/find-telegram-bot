@@ -52,14 +52,23 @@ class ScraperFacade {
             .replace(/(?:https?|ftp):\/\/[\n\S]+/g, '')
             .trim()
 
+        let needDotsPostfix = false
+
         const maxLength = this._config.message.descriptionMaxLength
         if (result.length > maxLength) {
             result = result.slice(0, maxLength)
-            const hasDots = result.endsWith('...') || result.endsWith(chars.dots)
+            needDotsPostfix = true
+        }
 
-            if (!hasDots) {
-                result = `${result}${chars.dots}`
-            }
+        const hasDotsPostfix = new RegExp(`[ \t\.${chars.dots}]{1,}\$`)
+        const resultWithoutDots = result.replace(hasDotsPostfix, '')
+        if (resultWithoutDots.length < result.length) {
+            result = resultWithoutDots
+            needDotsPostfix = true
+        }
+
+        if (needDotsPostfix) {
+            result = `${result}${chars.dots}`
         }
 
         return result
