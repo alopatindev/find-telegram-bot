@@ -9,7 +9,7 @@
 
 const assert = require('assert')
 
-const { createAppObjectsMock, logger } = require('./utils.js')
+const { createAppObjectsMock } = require('./utils.js')
 
 const chars = require('../bot/chars.json')
 const Scraper = require('../bot/scrapers/scraper.js')
@@ -85,7 +85,7 @@ function testScrapers(type, done, testClosure) {
         .find('query')
         .then(testClosure)
         .then(done)
-        .catch(logger.error)
+        .catch(done)
 }
 
 describe('ScraperFacade.find', () => {

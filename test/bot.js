@@ -8,7 +8,7 @@
 'use strict'
 
 const assert = require('assert')
-const { createAppObjectsMock, logger } = require('./utils.js')
+const { createAppObjectsMock } = require('./utils.js')
 
 const Bot = require('../bot')
 const chars = require('../bot/chars.json')
@@ -73,7 +73,7 @@ class TelegrafMock {
                 assert(self.polling)
 
                 const promiseResult = new Promise(resolve => self.onReply(text, resolve))
-                    .catch(logger.error)
+                    .catch(self._done)
 
                 return promiseResult
             },
@@ -89,7 +89,7 @@ class TelegrafMock {
                 this._done()
             }
         } catch (e) {
-            logger.error(e)
+            this._done(e)
         }
 
         resolve()
