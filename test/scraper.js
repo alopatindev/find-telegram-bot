@@ -11,11 +11,11 @@ const assert = require('assert')
 
 const Scraper = require('../bot/scrapers/scraper.js')
 
-class MockIncompleteScraper extends Scraper {}
+class StubIncompleteScraper extends Scraper {}
 
 describe('Scraper', () => {
     it('should throw TypeError if _onCreatePage is not implemented', done => {
-        const scraper = new MockIncompleteScraper()
+        const scraper = new StubIncompleteScraper()
         assert.throws(scraper._onCreatePage, TypeError)
         done()
     })

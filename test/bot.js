@@ -97,20 +97,18 @@ class TelegrafMock {
 }
 
 function createScraperFacadeMock(resultsType) {
-    let results = undefined
+    const scraperResults = new Map()
 
-    if (resultsType === 'stub') {
-        results = new Map()
-    } else if (resultsType === 'mock') {
-        results = new Map([
-            ['bbot', 'second bot'],
-            ['abot', 'first bot'],
-            ['cbot', 'third bot'],
-            ['zbot', 'last bot'],
-        ])
-    } else {
-        throw new Error('No such ScraperFacade type')
-    }
+    scraperResults.set('stub', new Map())
+    scraperResults.set('mock', new Map([
+        ['bbot', 'second bot'],
+        ['abot', 'first bot'],
+        ['cbot', 'third bot'],
+        ['zbot', 'last bot'],
+    ]))
+
+    assert(scraperResults.has(resultsType), `Unknown scraper results ${resultsType}`)
+    const results = scraperResults.get(resultsType)
 
     return { find: _query => new Promise(resolve => resolve(results)) }
 }

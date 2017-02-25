@@ -54,7 +54,7 @@ class MockBScraper extends Scraper {
     }
 }
 
-class DummyConnectScraper extends Scraper {
+class MockConnectScraper extends Scraper {
     _onCreatePage(query, phantomController) {
         const url = 'http://example.com'
         const scripts = ['function() { return [["dummy_bot", "dummy"]] }']
@@ -74,7 +74,7 @@ class DummyConnectScraper extends Scraper {
     }
 }
 
-class DummyOnCallbackScraper extends Scraper {
+class MockOnCallbackScraper extends Scraper {
     _onCreatePage(query, phantomController) {
         const shared = {}
         const url = 'http://example.com'
@@ -159,8 +159,8 @@ function createScrapersTestDouble(type, appObjects) {
 
     generators.set('stub', () => Object({ scraperA: new StubScraper(appObjects), scraperB: new StubScraper(appObjects) }))
     generators.set('mock', () => Object({ scraperA: new MockAScraper(appObjects), scraperB: new MockBScraper(appObjects) }))
-    generators.set('connect-dummy', () => Object({ scraper: new DummyConnectScraper(appObjects) }))
-    generators.set('callback-dummy', () => Object({ scraper: new DummyOnCallbackScraper(appObjects) }))
+    generators.set('connect-mock', () => Object({ scraper: new MockConnectScraper(appObjects) }))
+    generators.set('callback-mock', () => Object({ scraper: new MockOnCallbackScraper(appObjects) }))
     generators.set('invalid-host-mock', () => Object({ scraper: new MockInvalidHostScraper(appObjects) }))
     generators.set('without-script-mock', () => Object({ scraper: new MockWithoutScriptScraper(appObjects) }))
 
@@ -298,11 +298,11 @@ describe('ScraperFacade.find', () => {
         assert(!hasNamesWithWhitespace)
     }))
 
-    it('should be able to connect to existing server', done => testScrapers('connect-dummy', done, results => {
+    it('should be able to connect to existing server', done => testScrapers('connect-mock', done, results => {
         assert.strictEqual(results.get('dummy_bot'), 'dummy')
     }))
 
-    it('should be able to return data with onCallback', done => testScrapers('callback-dummy', done, results => {
+    it('should be able to return data with onCallback', done => testScrapers('callback-mock', done, results => {
         assert.strictEqual(results.get('dummy_bot'), 'dummy')
     }))
 
