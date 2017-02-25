@@ -3,6 +3,9 @@ engines:
     enabled: true
     channel: 'eslint-3'
     config: .eslintrc.yml
+    checks:
+      class-methods-use-this:
+        enabled: false
   duplication:
     enabled: true
     config:
