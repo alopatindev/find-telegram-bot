@@ -8,7 +8,7 @@
 'use strict'
 
 const Scraper = require('./scraper.js')
-const storebotScript = require('./browser-scripts/storebot.js')
+const storebotScript = require('./phantom-scripts/storebot.js')
 
 class StorebotScraper extends Scraper {
     _onCreatePage(query, phantomController) {

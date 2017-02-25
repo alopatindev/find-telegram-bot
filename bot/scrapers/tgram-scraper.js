@@ -8,7 +8,7 @@
 'use strict'
 
 const Scraper = require('./scraper.js')
-const tgramScript = require('./browser-scripts/tgram.js')
+const tgramScript = require('./phantom-scripts/tgram.js')
 
 class TgramScraper extends Scraper {
     _onCreatePage(query, phantomController) {
