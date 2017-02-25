@@ -16,7 +16,7 @@ Find Telegram Bot
 - scrapes data with **PhantomJS**
 - interacts with Telegram using **Telegraf**
 
-![Screenshot](https://raw.githubusercontent.com/alopatindev/assets/master/find-telegram-bot.png)
+<p align="center"><img src="https://raw.githubusercontent.com/alopatindev/assets/master/find-telegram-bot.png" width="512" height="512"></p>
 
 License
 -------
