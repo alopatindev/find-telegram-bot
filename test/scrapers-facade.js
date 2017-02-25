@@ -45,7 +45,7 @@ class MockBScraper extends Scraper {
         return createOnCreatePage(phantomController, [
             ['Cbot', 'New description'],
             ['dbot', 'New name and description'],
-            [' Fbot  ', 'Bot name will be trimmed'],
+            [' Fbot  ', 'Bot name will be trimmed, /slash will be replaced'],
             ['G bot', 'Will be removed because of invalid name'],
             ['', 'Will be removed because of invalid name'],
             ['longbot', 'Very-very-very-very-very-very-very-very-very-very-very-very long description'],
@@ -257,6 +257,17 @@ describe('ScraperFacade.find', () => {
             .length > 0
 
         assert(!hasAtChar)
+    }))
+
+    it('should replace / with a similar character in description', done => testScrapers('mock', done, results => {
+        const hasSlashChar = Array.from(results.values())
+            .filter(description => description
+                .slice(1)
+                .includes('/'))
+            .length > 0
+
+        assert(!hasSlashChar)
+        assert.strictEqual(results.get('fbot'), `Bot name will be trimmed, ${chars.fullwidth_solidus}slash will be replaced`)
     }))
 
     it('should remove new lines from description', done => testScrapers('mock', done, results => {

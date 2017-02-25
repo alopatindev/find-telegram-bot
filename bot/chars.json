@@ -1,4 +1,5 @@
 {
   "dots": "\u2026",
-  "em_dash": "\u2014"
+  "em_dash": "\u2014",
+  "fullwidth_solidus": "\uFF0F"
 }
