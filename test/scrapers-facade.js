@@ -54,23 +54,119 @@ class MockBScraper extends Scraper {
     }
 }
 
-function createScrapersTestDouble(type, appObjects) {
-    let result = undefined
+class DummyConnectScraper extends Scraper {
+    _onCreatePage(query, phantomController) {
+        const url = 'http://example.com'
+        const scripts = ['function() { return [["dummy_bot", "dummy"]] }']
 
-    if (type === 'stub') {
-        result = {
-            scraperA: new StubScraper(appObjects),
-            scraperB: new StubScraper(appObjects),
-        }
-    } else if (type === 'mock') {
-        result = {
-            scraperA: new MockAScraper(appObjects),
-            scraperB: new MockBScraper(appObjects),
-        }
-    } else {
-        throw new Error('No such scrapers type')
+        const resultPromise = phantomController
+            .openAndRun(url, scripts)
+            .then(result => {
+                phantomController.exit()
+                return result
+            })
+            .catch(e => {
+                phantomController.exit(e)
+                return []
+            })
+
+        return resultPromise
     }
+}
 
+class DummyOnCallbackScraper extends Scraper {
+    _onCreatePage(query, phantomController) {
+        const shared = {}
+        const url = 'http://example.com'
+        const scripts = [`
+            function() {
+                const timeoutMs = 100
+
+                setTimeout(function() {
+                    window.callPhantom([["dummy_bot", "dummy"]])
+                }, timeoutMs) // emulate some activity
+            }
+        `]
+
+        phantomController.setOnCallback(result => {
+            try {
+                phantomController.exit()
+
+                // return the final result
+                shared.onResolveResult(result)
+            } catch (e) {
+                shared.onRejectResult(e)
+            }
+        })
+
+        const resultPromise = phantomController
+            .openAndRun(url, scripts)
+            .then(() => new Promise((resolve, reject) => {
+                shared.onResolveResult = resolve
+                shared.onRejectResult = reject
+            }))
+            .catch(e => {
+                phantomController.exit(e)
+                return []
+            })
+
+        return resultPromise
+    }
+}
+
+class MockInvalidHostScraper extends Scraper {
+    _onCreatePage(query, phantomController) {
+        const url = 'https://invalid-host'
+        const scripts = ['function() {}']
+
+        const resultPromise = phantomController
+            .openAndRun(url, scripts)
+            .then(result => {
+                phantomController.exit()
+                return result // this will never happen
+            })
+            .catch(e => {
+                phantomController.exit(e)
+                return []
+            })
+
+        return resultPromise
+    }
+}
+
+class MockWithoutScriptScraper extends Scraper {
+    _onCreatePage(query, phantomController) {
+        const baseUrl = 'http://example.com'
+        const scripts = []
+
+        const resultPromise = phantomController
+            .openAndRun(baseUrl, scripts)
+            .then(result => {
+                phantomController.exit()
+                return result // this will never happen
+            })
+            .catch(e => {
+                phantomController.exit(e)
+                return []
+            })
+
+        return resultPromise
+    }
+}
+
+function createScrapersTestDouble(type, appObjects) {
+    const generators = new Map()
+
+    generators.set('stub', () => Object({ scraperA: new StubScraper(appObjects), scraperB: new StubScraper(appObjects) }))
+    generators.set('mock', () => Object({ scraperA: new MockAScraper(appObjects), scraperB: new MockBScraper(appObjects) }))
+    generators.set('connect-dummy', () => Object({ scraper: new DummyConnectScraper(appObjects) }))
+    generators.set('callback-dummy', () => Object({ scraper: new DummyOnCallbackScraper(appObjects) }))
+    generators.set('invalid-host-mock', () => Object({ scraper: new MockInvalidHostScraper(appObjects) }))
+    generators.set('without-script-mock', () => Object({ scraper: new MockWithoutScriptScraper(appObjects) }))
+
+    assert(generators.has(type), `Unknown generator ${type}`)
+
+    const result = generators.get(type)()
     appObjects.config.scrapers = Object.keys(result)
 
     return result
@@ -189,5 +285,21 @@ describe('ScraperFacade.find', () => {
             .length === results.length
 
         assert(!hasNamesWithWhitespace)
+    }))
+
+    it('should be able to connect to existing server', done => testScrapers('connect-dummy', done, results => {
+        assert.strictEqual(results.get('dummy_bot'), 'dummy')
+    }))
+
+    it('should be able to return data with onCallback', done => testScrapers('callback-dummy', done, results => {
+        assert.strictEqual(results.get('dummy_bot'), 'dummy')
+    }))
+
+    it('should return empty result if connection error occuried', done => testScrapers('invalid-host-mock', done, results => {
+        assert.strictEqual(results.size, 0)
+    }))
+
+    it('should return empty result if script is not set', done => testScrapers('without-script-mock', done, results => {
+        assert.strictEqual(results.size, 0)
     }))
 })

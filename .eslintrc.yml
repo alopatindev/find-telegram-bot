@@ -253,8 +253,8 @@ rules:
   better/no-variable-declaration: off
   better/no-whiles: warn
   better/explicit-return: off
-  mocha/no-exclusive-tests: warn
-  mocha/no-skipped-tests: warn
+  mocha/no-exclusive-tests: error
+  mocha/no-skipped-tests: error
   mocha/no-pending-tests: warn
   mocha/handle-done-callback: warn
   mocha/no-synchronous-tests: warn

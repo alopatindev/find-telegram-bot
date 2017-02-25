@@ -20,10 +20,14 @@ class TgramScraper extends Scraper {
         const url = encodeURI(`${baseUrl}/bots`)
 
         phantomController.setOnCallback(result => {
-            phantomController.exit()
+            try {
+                phantomController.exit()
 
-            // return the final result
-            shared.onResolveResult(result)
+                // return the final result
+                shared.onResolveResult(result)
+            } catch (e) {
+                shared.onRejectResult(e)
+            }
         })
 
         const scripts = [

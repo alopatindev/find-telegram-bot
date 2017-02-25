@@ -13,8 +13,8 @@ const Scraper = require('../bot/scrapers/scraper.js')
 
 class MockIncompleteScraper extends Scraper {}
 
-describe('Incomplete Scraper', () => {
-    it('should throw TypeError for incomplete scrapers', done => {
+describe('Scraper', () => {
+    it('should throw TypeError if _onCreatePage is not implemented', done => {
         const scraper = new MockIncompleteScraper()
         assert.throws(scraper._onCreatePage, TypeError)
         done()
