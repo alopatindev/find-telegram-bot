@@ -61,6 +61,8 @@ class Bot {
     }
 
     _onResultsReady(ctx, lines) {
+        this._logger.debug(`_onResultsReady: ${lines.length}`)
+
         ctx
             .reply(`${this._config.text.foundBots}${lines.length}`)
             .then(() => this._onNextReply(ctx, lines, 0))
