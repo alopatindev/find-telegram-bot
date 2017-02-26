@@ -16,7 +16,6 @@
     "start": "node ./app.js"
   },
   "dependencies": {
-    "nodemon": "^1.11.0",
     "phantom": "^4.0.0",
     "telegraf": "^3.6.6",
     "winston": "^2.3.1"
@@ -31,6 +30,7 @@
     "eslint-plugin-promise": "^3.4.2",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
-    "mocha-logger": "^1.0.5"
+    "mocha-logger": "^1.0.5",
+    "nodemon": "^1.11.0"
   }
 }

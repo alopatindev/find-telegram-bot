@@ -113,39 +113,72 @@ function createScraperFacadeMock(resultsType) {
     return { find: _query => new Promise(resolve => resolve(results)) }
 }
 
-function testBotReply(resultsType, message, expectMessages, done, testClosure) { // FIXME: use Builder pattern?
-    const appObjectsMock = createAppObjectsMock()
+class BotReplyMock {
+    simulateMessage(message) {
+        this._message = message
+        return this
+    }
 
-    const telegrafMock = new TelegrafMock(done, appObjectsMock)
-    telegrafMock.expectMessages = expectMessages
-    telegrafMock.testMessageReplyClosure = testClosure
+    receiveResults(resultsType) {
+        this._resultsType = resultsType
+        return this
+    }
 
-    const scraperFacadeMock = createScraperFacadeMock(resultsType)
+    expectResultMessages(expectMessages) {
+        this._expectMessages = expectMessages
+        return this
+    }
 
-    const bot = new Bot(telegrafMock, scraperFacadeMock, appObjectsMock)
-    bot.run()
+    verify(done, testClosure) {
+        const appObjectsMock = createAppObjectsMock()
 
-    telegrafMock.simulateMessage(message)
+        const telegrafMock = new TelegrafMock(done, appObjectsMock)
+        telegrafMock.expectMessages = this._expectMessages
+        telegrafMock.testMessageReplyClosure = testClosure
+
+        const scraperFacadeMock = createScraperFacadeMock(this._resultsType)
+
+        const bot = new Bot(telegrafMock, scraperFacadeMock, appObjectsMock)
+        bot.run()
+
+        telegrafMock.simulateMessage(this._message)
+    }
 }
 
 describe('Bot', () => {
-    it('should handle /start command', done => testBotReply('stub', '/start', 1, done, (messages, config) => {
-        assert.strictEqual(messages[0], config.text.welcome)
-    }))
+    it('should handle /start command', done => new BotReplyMock()
+        .simulateMessage('/start')
+        .receiveResults('stub')
+        .expectResultMessages(1)
+        .verify(done, (messages, config) => {
+            assert.strictEqual(messages[0], config.text.welcome)
+        }))
 
-    it('should handle empty string as /start command', done => testBotReply('stub', '', 1, done, (messages, config) => {
-        assert.strictEqual(messages[0], config.text.welcome)
-    }))
+    it('should handle empty string as /start command', done => new BotReplyMock()
+        .simulateMessage('')
+        .receiveResults('stub')
+        .expectResultMessages(1)
+        .verify(done, (messages, config) => {
+            assert.strictEqual(messages[0], config.text.welcome)
+        }))
 
-    it('should handle stub replies', done => testBotReply('stub', 'query', 1, done, (messages, config) => {
-        const botsNumber = 0
-        assert.strictEqual(messages[0], `${config.text.foundBots}${botsNumber}`)
-    }))
+    it('should handle stub replies', done => new BotReplyMock()
+        .simulateMessage('query')
+        .receiveResults('stub')
+        .expectResultMessages(1)
+        .verify(done, (messages, config) => {
+            const botsNumber = 0
+            assert.strictEqual(messages[0], `${config.text.foundBots}${botsNumber}`)
+        }))
 
-    it('should sort, format and split output', done => testBotReply('mock', 'query', 3, done, (messages, config) => {
-        const botsNumber = 4
-        assert.strictEqual(messages[0], `${config.text.foundBots}${botsNumber}`)
-        assert.strictEqual(messages[1], `@abot ${chars.em_dash} first bot\n@bbot ${chars.em_dash} second bot\n@cbot ${chars.em_dash} third bot`)
-        assert.strictEqual(messages[2], `@zbot ${chars.em_dash} last bot`)
-    }))
+    it('should sort, format and split output', done => new BotReplyMock()
+        .simulateMessage('query')
+        .receiveResults('mock')
+        .expectResultMessages(3)
+        .verify(done, (messages, config) => {
+            const botsNumber = 4
+            assert.strictEqual(messages[0], `${config.text.foundBots}${botsNumber}`)
+            assert.strictEqual(messages[1], `@abot ${chars.em_dash} first bot\n@bbot ${chars.em_dash} second bot\n@cbot ${chars.em_dash} third bot`)
+            assert.strictEqual(messages[2], `@zbot ${chars.em_dash} last bot`)
+        }))
 })

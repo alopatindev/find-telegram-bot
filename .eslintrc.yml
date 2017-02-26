@@ -257,7 +257,7 @@ rules:
   mocha/no-skipped-tests: error
   mocha/no-pending-tests: warn
   mocha/handle-done-callback: warn
-  mocha/no-synchronous-tests: warn
+  mocha/no-synchronous-tests: error
   mocha/no-global-tests: warn
   mocha/no-return-and-callback: off
   mocha/valid-test-description: warn

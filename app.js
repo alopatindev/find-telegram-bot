@@ -25,7 +25,8 @@ function onExit(signal) {
     process.exit(0)
 }
 
-['SIGINT', 'SIGTERM'].forEach(signal => {
+const terminationSignals = ['SIGINT', 'SIGTERM']
+terminationSignals.forEach(signal => {
     logger.debug(`set ${signal} handler`)
     process.on(signal, () => onExit(signal))
 })
