@@ -16,6 +16,7 @@ script:
   - npm test
 
 after_script:
+  - bithound check git@github.com:alopatindev/find-telegram-bot.git
   - npm install -g codeclimate-test-reporter
   - npm run coverage
   - codeclimate-test-reporter < ./coverage/lcov.info
