@@ -22,13 +22,13 @@ function createOnCreatePage(phantomController, results) {
     })
 }
 
-class StubScraper extends Scraper {
+class ScraperStub extends Scraper {
     _onCreatePage(query, phantomController) {
         return createOnCreatePage(phantomController, [])
     }
 }
 
-class MockAScraper extends Scraper {
+class ScraperAMock extends Scraper {
     _onCreatePage(query, phantomController) {
         return createOnCreatePage(phantomController, [
             ['Dbot', 'Both name and description will be overriden'],
@@ -40,7 +40,7 @@ class MockAScraper extends Scraper {
     }
 }
 
-class MockBScraper extends Scraper {
+class ScraperBMock extends Scraper {
     _onCreatePage(query, phantomController) {
         return createOnCreatePage(phantomController, [
             ['Cbot', 'New description'],
@@ -54,7 +54,7 @@ class MockBScraper extends Scraper {
     }
 }
 
-class MockConnectScraper extends Scraper {
+class ConnectScraperMock extends Scraper {
     _onCreatePage(query, phantomController) {
         const url = 'http://example.com'
         const scripts = ['function() { return [["dummy_bot", "dummy"]] }']
@@ -74,7 +74,7 @@ class MockConnectScraper extends Scraper {
     }
 }
 
-class MockOnCallbackScraper extends Scraper {
+class OnCallbackScraperMock extends Scraper {
     _onCreatePage(query, phantomController) {
         const shared = {}
         const url = 'http://example.com'
@@ -114,7 +114,7 @@ class MockOnCallbackScraper extends Scraper {
     }
 }
 
-class MockInvalidHostScraper extends Scraper {
+class InvalidHostScraperMock extends Scraper {
     _onCreatePage(query, phantomController) {
         const url = 'https://invalid-host'
         const scripts = ['function() {}']
@@ -134,7 +134,7 @@ class MockInvalidHostScraper extends Scraper {
     }
 }
 
-class MockWithoutScriptScraper extends Scraper {
+class WithoutScriptScraperMock extends Scraper {
     _onCreatePage(query, phantomController) {
         const baseUrl = 'http://example.com'
         const scripts = []
@@ -157,12 +157,12 @@ class MockWithoutScriptScraper extends Scraper {
 function createScrapersTestDouble(type, appObjects) {
     const generators = new Map()
 
-    generators.set('stub', () => Object({ scraperA: new StubScraper(appObjects), scraperB: new StubScraper(appObjects) }))
-    generators.set('mock', () => Object({ scraperA: new MockAScraper(appObjects), scraperB: new MockBScraper(appObjects) }))
-    generators.set('connect-mock', () => Object({ scraper: new MockConnectScraper(appObjects) }))
-    generators.set('callback-mock', () => Object({ scraper: new MockOnCallbackScraper(appObjects) }))
-    generators.set('invalid-host-mock', () => Object({ scraper: new MockInvalidHostScraper(appObjects) }))
-    generators.set('without-script-mock', () => Object({ scraper: new MockWithoutScriptScraper(appObjects) }))
+    generators.set('stub', () => Object({ scraperA: new ScraperStub(appObjects), scraperB: new ScraperStub(appObjects) }))
+    generators.set('mock', () => Object({ scraperA: new ScraperAMock(appObjects), scraperB: new ScraperBMock(appObjects) }))
+    generators.set('connect-mock', () => Object({ scraper: new ConnectScraperMock(appObjects) }))
+    generators.set('callback-mock', () => Object({ scraper: new OnCallbackScraperMock(appObjects) }))
+    generators.set('invalid-host-mock', () => Object({ scraper: new InvalidHostScraperMock(appObjects) }))
+    generators.set('without-script-mock', () => Object({ scraper: new WithoutScriptScraperMock(appObjects) }))
 
     assert(generators.has(type), `Unknown generator ${type}`)
 
