@@ -25,7 +25,7 @@ function maybeAddDotsPostfix(description, truncated) {
     let result = description
     let needDotsPostfix = truncated
 
-    const dotsPostfixPattern = new RegExp(`[ \t.${chars.dots}]{1,}$`)
+    const dotsPostfixPattern = new RegExp(`[ \t.${chars.dots}]+$`)
     const resultWithoutDots = result.replace(dotsPostfixPattern, '')
 
     if (resultWithoutDots.length < result.length) {
