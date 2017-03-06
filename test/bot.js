@@ -96,21 +96,31 @@ class TelegrafMock {
     }
 }
 
-function createScraperFacadeMock(resultsType) {
-    const scraperResults = new Map()
+class ScraperFacadeMock {
+    static create(resultsType) {
+        const scraperResults = new Map()
 
-    scraperResults.set('stub', new Map())
-    scraperResults.set('mock', new Map([
-        ['bbot', 'second bot'],
-        ['abot', 'first bot'],
-        ['cbot', 'third bot'],
-        ['zbot', 'last bot'],
-    ]))
+        scraperResults.set('stub', new Map())
+        scraperResults.set('mock', new Map([
+            ['bbot', 'second bot'],
+            ['abot', 'first bot'],
+            ['cbot', 'third bot'],
+            ['zbot', 'last bot'],
+        ]))
 
-    assert(scraperResults.has(resultsType), `Unknown scraper results ${resultsType}`)
-    const results = scraperResults.get(resultsType)
+        assert(scraperResults.has(resultsType), `Unknown scraper results ${resultsType}`)
+        const results = scraperResults.get(resultsType)
 
-    return { find: _query => new Promise(resolve => resolve(results)) }
+        return new ScraperFacadeMock(results)
+    }
+
+    constructor(results) {
+        this._results = results
+    }
+
+    find(_query) {
+        return new Promise(resolve => resolve(this._results))
+    }
 }
 
 class BotReplyMock {
@@ -136,7 +146,7 @@ class BotReplyMock {
         telegrafMock.expectMessages = this._expectMessages
         telegrafMock.testMessageReplyClosure = testClosure
 
-        const scraperFacadeMock = createScraperFacadeMock(this._resultsType)
+        const scraperFacadeMock = ScraperFacadeMock.create(this._resultsType)
 
         const bot = new Bot(telegrafMock, scraperFacadeMock, appObjectsMock)
         bot.run()

@@ -25,6 +25,8 @@ function createAppObjectsMock() {
                 maxLines: 3,
             },
 
+            mongoUrl: 'mongodb://localhost:27017/test',
+
             text: {
                 foundBots: 'Found bots: ',
                 welcome: 'Welcome!',
