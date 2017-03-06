@@ -275,7 +275,7 @@ describe('ScraperFacade.find', () => {
             .length > 0
 
         assert(!hasSlashChar)
-        assert.strictEqual(results.get('f'), `Bot name will be trimmed, ${chars.fullwidth_solidus}slash will be replaced`)
+        assert.strictEqual(results.get('f'), `Bot name will be trimmed, ${chars.fullwidthSolidus}slash will be replaced`)
     }))
 
     it('should remove new lines from description', done => testScrapers('mock', done, results => {

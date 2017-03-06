@@ -188,7 +188,7 @@ describe('Bot', () => {
         .verify(done, (messages, config) => {
             const botsNumber = 4
             assert.strictEqual(messages[0], `${config.text.foundBots}${botsNumber}`)
-            assert.strictEqual(messages[1], `@abot ${chars.em_dash} first bot\n@bbot ${chars.em_dash} second bot\n@cbot ${chars.em_dash} third bot`)
-            assert.strictEqual(messages[2], `@zbot ${chars.em_dash} last bot`)
+            assert.strictEqual(messages[1], `@abot ${chars.emDash} first bot\n@bbot ${chars.emDash} second bot\n@cbot ${chars.emDash} third bot`)
+            assert.strictEqual(messages[2], `@zbot ${chars.emDash} last bot`)
         }))
 })

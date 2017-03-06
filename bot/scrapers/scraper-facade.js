@@ -100,7 +100,7 @@ class ScraperFacade {
         let result = description
             .replace(/(?:https?|ftp):\/\/[\n\S]+/g, '')
             .replace(/[@\n]/g, '')
-            .replace('/', chars.fullwidth_solidus)
+            .replace('/', chars.fullwidthSolidus)
             .trim()
 
         let truncated = false
