@@ -191,31 +191,39 @@ describe('ScraperFacade.find', () => {
 
     it('should override previous descriptions', done => testScrapers('mock', done, results => {
         const hasOldDescriptions =
-            results.get('cbot') === 'Description will be overriden' ||
-            results.get('dbot') === 'Both name and description will be overriden'
+            results.get('c') === 'Description will be overriden' ||
+            results.get('d') === 'Both name and description will be overriden'
 
         const hasNewDescriptions =
-            results.get('cbot') === 'New description' &&
-            results.get('dbot') === 'New name and description'
+            results.get('c') === 'New description' &&
+            results.get('d') === 'New name and description'
 
         assert(!hasOldDescriptions)
         assert(hasNewDescriptions)
     }))
 
     it('should have case-insensitive bot names', done => testScrapers('mock', done, results => {
-        const hasOldName = results.has('Dbot')
-        const hasNewName = results.has('dbot')
+        const hasOldName = results.has('D')
+        const hasNewName = results.has('d')
 
         assert(!hasOldName)
         assert(hasNewName)
     }))
 
     it('should contain only bot names with postfix "bot"', done => testScrapers('mock', done, results => {
-        const nameHasPostfixBot = Array.from(results.keys())
-            .filter(name => name.endsWith('bot'))
-            .length === results.size
+        const hasOnlyValidNames = Array.from(results.keys())
+            .filter(name => name.endsWith('botty'))
+            .length === 0
 
-        assert(nameHasPostfixBot)
+        assert(hasOnlyValidNames)
+    }))
+
+    it('should not contain postfix "bot"', done => testScrapers('mock', done, results => {
+        const nameHasPostfix = Array.from(results.keys())
+            .filter(name => name.endsWith('bot'))
+            .length > 0
+
+        assert(!nameHasPostfix)
     }))
 
     it('should trim description whitespace', done => testScrapers('mock', done, results => {
@@ -231,11 +239,11 @@ describe('ScraperFacade.find', () => {
     }))
 
     it('should truncate long descriptions and put a single dots character', done => testScrapers('mock', done, results => {
-        assert.strictEqual(results.get('longbot'), `Very-very-very-very-very-very-very-very-very-very-very-very long descr${chars.dots}`)
+        assert.strictEqual(results.get('long'), `Very-very-very-very-very-very-very-very-very-very-very-very long descr${chars.dots}`)
     }))
 
     it('should replace all dots at the end of description with a single dots character', done => testScrapers('mock', done, results => {
-        assert.strictEqual(results.get('shortbot'), `New name and description with dots${chars.dots}`)
+        assert.strictEqual(results.get('short'), `New name and description with dots${chars.dots}`)
     }))
 
     it('should remove URLs from description', done => testScrapers('mock', done, results => {
@@ -267,7 +275,7 @@ describe('ScraperFacade.find', () => {
             .length > 0
 
         assert(!hasSlashChar)
-        assert.strictEqual(results.get('fbot'), `Bot name will be trimmed, ${chars.fullwidth_solidus}slash will be replaced`)
+        assert.strictEqual(results.get('f'), `Bot name will be trimmed, ${chars.fullwidth_solidus}slash will be replaced`)
     }))
 
     it('should remove new lines from description', done => testScrapers('mock', done, results => {
@@ -299,11 +307,11 @@ describe('ScraperFacade.find', () => {
     }))
 
     it('should be able to connect to existing server', done => testScrapers('connect-mock', done, results => {
-        assert.strictEqual(results.get('dummy_bot'), 'dummy')
+        assert.strictEqual(results.get('dummy_'), 'dummy')
     }))
 
     it('should be able to return data with onCallback', done => testScrapers('callback-mock', done, results => {
-        assert.strictEqual(results.get('dummy_bot'), 'dummy')
+        assert.strictEqual(results.get('dummy_'), 'dummy')
     }))
 
     it('should return empty result if connection error occuried', done => testScrapers('invalid-host-mock', done, results => {

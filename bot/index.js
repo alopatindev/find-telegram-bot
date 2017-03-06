@@ -13,7 +13,7 @@ function sortAndFormatResults(results) {
     return Array
         .from(results)
         .sort()
-        .map(([name, description]) => `@${name} ${chars.em_dash} ${description}`)
+        .map(([name, description]) => `@${name}bot ${chars.em_dash} ${description}`)
 }
 
 class Bot {

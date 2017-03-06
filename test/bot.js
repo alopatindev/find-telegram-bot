@@ -102,10 +102,10 @@ class ScraperFacadeMock {
 
         scraperResults.set('stub', new Map())
         scraperResults.set('mock', new Map([
-            ['bbot', 'second bot'],
-            ['abot', 'first bot'],
-            ['cbot', 'third bot'],
-            ['zbot', 'last bot'],
+            ['b', 'second bot'],
+            ['a', 'first bot'],
+            ['c', 'third bot'],
+            ['z', 'last bot'],
         ]))
 
         assert(scraperResults.has(resultsType), `Unknown scraper results ${resultsType}`)

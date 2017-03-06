@@ -14,11 +14,19 @@ function flatten(arrays) {
     return [].concat(...arrays)
 }
 
+function isValidName(name) {
+    const hasWhitespace = name.includes(' ') || name.includes('\t')
+    const hasPostfix = name.endsWith(BOT_POSTFIX)
+    return !hasWhitespace && hasPostfix
+}
+
+function isValidDescription(description) {
+    return description.length > 0
+}
+
 function isValidResult(result) {
     const [name, description] = result
-    const nameHasWhitespace = name.includes(' ') || name.includes('\t')
-    const descriptionIsEmpty = description.length === 0
-    return name.endsWith(BOT_POSTFIX) && !nameHasWhitespace && !descriptionIsEmpty
+    return name !== undefined && description !== undefined
 }
 
 function maybeAddDotsPostfix(description, truncated) {
@@ -68,12 +76,24 @@ class ScraperFacade {
     _mergeAndFilterResults(results) {
         const updatedResults = flatten(results)
             .map(([name, description]) => [
-                name.toLowerCase().trim(),
+                this._filterName(name),
                 this._filterDescription(description),
             ])
             .filter(result => isValidResult(result))
 
         return new Map(updatedResults)
+    }
+
+    _filterName(name) {
+        const trimmedName = name
+            .toLowerCase()
+            .trim()
+
+        if (isValidName(trimmedName)) {
+            return trimmedName.replace(/bot$/, '')
+        } else {
+            return undefined
+        }
     }
 
     _filterDescription(description) {
@@ -90,7 +110,11 @@ class ScraperFacade {
             truncated = true
         }
 
-        return maybeAddDotsPostfix(result, truncated)
+        if (isValidDescription(result)) {
+            return maybeAddDotsPostfix(result, truncated)
+        } else {
+            return undefined
+        }
     }
 }
 
