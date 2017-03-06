@@ -17,27 +17,37 @@ logger.error = e => {
 
 const functionStub = () => undefined
 
+function createDbControllerMock() {
+    return {}
+}
+
 function createAppObjectsMock() {
+    const configMock = {
+        message: {
+            descriptionMaxLength: 70,
+            maxLines: 3,
+        },
+
+        mongoUrl: 'mongodb://localhost:27017/test',
+
+        text: {
+            foundBots: 'Found bots: ',
+            welcome: 'Welcome!',
+        },
+    }
+
+    const loggerMock = {
+        debug: functionStub,
+        error: logger.error,
+        info: functionStub,
+    }
+
+    const dbControllerMock = createDbControllerMock()
+
     return {
-        config: {
-            message: {
-                descriptionMaxLength: 70,
-                maxLines: 3,
-            },
-
-            mongoUrl: 'mongodb://localhost:27017/test',
-
-            text: {
-                foundBots: 'Found bots: ',
-                welcome: 'Welcome!',
-            },
-        },
-
-        logger: {
-            debug: functionStub,
-            error: logger.error,
-            info: functionStub,
-        },
+        config: configMock,
+        dbController: dbControllerMock,
+        logger: loggerMock,
     }
 }
 
