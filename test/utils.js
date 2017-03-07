@@ -17,42 +17,42 @@ logger.error = e => {
 
 const functionStub = () => undefined
 
-function createDbControllerMock() {
-    return {}
-}
-
-function createAppObjectsMock() {
-    const configMock = {
+function createConfigMock() {
+    return {
         message: {
             descriptionMaxLength: 70,
             maxLines: 3,
         },
-
-        mongoUrl: 'mongodb://localhost:27017/test',
 
         text: {
             foundBots: 'Found bots: ',
             welcome: 'Welcome!',
         },
     }
+}
 
-    const loggerMock = {
+function createLoggerMock() {
+    return {
         debug: functionStub,
         error: logger.error,
         info: functionStub,
     }
+}
 
-    const dbControllerMock = createDbControllerMock()
+function createAppObjectsMock() {
+    const configMock = createConfigMock()
+    const loggerMock = createLoggerMock()
 
     return {
         config: configMock,
-        dbController: dbControllerMock,
         logger: loggerMock,
     }
 }
 
 module.exports = {
     createAppObjectsMock,
+    createConfigMock,
+    createLoggerMock,
     functionStub,
     logger,
 }

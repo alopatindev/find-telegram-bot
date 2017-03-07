@@ -12,8 +12,6 @@ module.exports = {
 
     telegramBotToken: '',
 
-    mongoUrl: 'mongodb://localhost:27017/find_telegram_bot',
-
     log: {
         file: 'logs/find-telegram-bot.log',
         maxSize: 1048576, // 1 MiB

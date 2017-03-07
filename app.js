@@ -10,12 +10,7 @@
 const config = require('./config.js')
 const logger = require('./logger.js')(config)
 
-const { MongoClient } = require('mongodb')
-
-const DbController = require('./bot/db-controller.js')
-const dbController = new DbController(MongoClient, config, logger)
-
-const appObjects = { config, dbController, logger }
+const appObjects = { config, logger }
 
 const scrapers = require('./bot/scrapers')(appObjects)
 const ScraperFacade = require('./bot/scrapers/scraper-facade.js')

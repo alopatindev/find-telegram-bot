@@ -16,9 +16,7 @@
     "start": "node ./app.js"
   },
   "dependencies": {
-    "mongodb": "^2.2.24",
     "phantom": "^4.0.0",
-    "sb-promisify": "^2.0.1",
     "telegraf": "^3.6.6",
     "winston": "^2.3.1"
   },
@@ -33,7 +31,6 @@
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
     "mocha-logger": "^1.0.5",
-    "mongo-mock": "^2.1.4",
     "nodemon": "^1.11.0"
   }
 }
