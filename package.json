@@ -16,8 +16,8 @@
     "start": "node ./app.js"
   },
   "dependencies": {
-    "phantom": "^4.0.0",
-    "telegraf": "^3.6.6",
+    "phantom": "^4.0.4",
+    "telegraf": "^3.7.4",
     "winston": "^2.3.1"
   },
   "devDependencies": {
